@@ -19,7 +19,7 @@ Task 2 采用现有 URS 展示版本，保留其修订记录及“最终批准�
 
 当前 URS 定义澳门旅行规划的需求。Travel Bill、Nearby Food Suggestions 和 Relaxed Pace 在当前需求基线中为 Optional。需求定义、实现完成和验收结果分别记录，不将计划中的功能标为已经完成。
 
-本次归档只包含 README 和两份项目 PDF，不包含应用源码、原型、问卷原始数据、性能测试或部署成果。
+历史文档归档提交只包含 README 和两份项目 PDF。自2026-11-02起，本仓库另含隔离分支开发的应用骨架；问卷原始数据和既有历史原件不随本次骨架提交。
 
 ## 目录
 
@@ -35,3 +35,37 @@ docs/
 ## 仓库
 
 [lzq2005/CS250-SE](https://github.com/lzq2005/CS250-SE)
+
+## Project Bootstrap — Temporary Implementation Baseline
+
+组长于2026-11-02授权开始实施，B/C/D尚未批准全部规范。参见 [Implementation Decisions](docs/engineering/implementation-decisions.md)。历史Proposal/URS与文档目录保留；本次仅骨架，不代表17项REQ已实现。
+
+Node 24（或22.12+）与npm；在仓库根目录：
+
+```sh
+npm install
+npm run db:generate
+npm run db:setup
+npm run dev
+```
+
+可选复制 `.env.example` 为 `.env` 修改本地端口/数据库。默认web http://127.0.0.1:5173，API http://127.0.0.1:3001/api/v1/health；SQLite文件位于apps/api/prisma/dev.db，不提交数据库。Vite代理/api至API。先退出旧进程再改端口；Playwright smoke使用默认端口。
+
+```sh
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npx playwright install chromium
+npm run test:e2e
+```
+
+生产构建API可用 `npm start`；web构建输出apps/web/dist，需要部署服务器反代/api。CI使用npm ci，生成Prisma client、迁移、检查、构建与浏览器smoke。不要把迁移元数据/DB连通当作Trip业务存储实现。尚未实现的业务路径返回404。运行验证记录见 [Bootstrap Verification](docs/engineering/bootstrap-verification.md)。
+
+- apps/web：Vue健康状态页面及模块占位
+- apps/api：Express app/server、SQLite探测及模块接入口
+- packages/contracts：临时v1.1修订稿类型
+- tests/unit、tests/e2e：HTTP边界及真实浏览器smoke
+- data/fixtures：B后续提供来源可查数据
+
+B/C/D分别在自己的分支实现Discovery/Planner/Itinerary与Map等，不在本骨架中代做。
