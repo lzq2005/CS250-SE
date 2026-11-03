@@ -93,7 +93,14 @@ export function generatePlan(input: PlannerInput): PlanResult {
         }
         const estimate = estimateTravel(current, poi.position, defaultTravelMode);
         if (estimate.durationMinutes === null) {
-          recordFailure({ poiId: poi.id, code: 'UNKNOWN_TRAVEL', reason: 'Travel duration is unknown.' });
+          // Travel cannot take negative time. If a visit is impossible even
+          // from the current departure time, its constraint is already known.
+          const earliest = visit(poi, dayWindow.date, time, dayEnd);
+          if ('code' in earliest && ['CLOSED', 'LAST_ENTRY', 'DAY_END'].includes(earliest.code)) {
+            recordFailure({ poiId: poi.id, ...earliest });
+          } else {
+            recordFailure({ poiId: poi.id, code: 'UNKNOWN_TRAVEL', reason: 'Travel duration is unknown.' });
+          }
           continue;
         }
         const arrive = time + estimate.durationMinutes;

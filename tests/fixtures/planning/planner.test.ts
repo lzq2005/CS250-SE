@@ -105,6 +105,16 @@ describe('generatePlan: shared contract', () => {
     expect(result.status).toBe('infeasible');
   });
 
+  it('reports a known missed last entry even when the transport duration is unknown', () => {
+    const input = plannerInput([poi(firstId, {
+      openingHours: [{ weekday: 1, open: '09:00', close: '10:00', lastEntry: '09:30' }],
+    })]);
+    input.defaultTravelMode = 'bus';
+    const result = generatePlan(input);
+    expect(result.unscheduled).toEqual([expect.objectContaining({ poiId: firstId, code: 'LAST_ENTRY' })]);
+    expect(result.status).toBe('infeasible');
+  });
+
   it('retains a visit that cannot fit into the daily window', () => {
     const input = plannerInput([poi(firstId)]);
     input.trip.dayWindows[0]!.end = '10:15';
@@ -198,6 +208,14 @@ describe('generatePlan: shared contract', () => {
     expect(result.estimatedTotalCost).toBeNull();
     expect(result.warnings).toEqual(expect.arrayContaining([expect.objectContaining({ code: 'UNKNOWN_FX' })]));
     expect(result.status).not.toBe('feasible');
+  });
+
+  it('keeps free walking at zero without requiring an exchange rate', () => {
+    const input = plannerInput([poi(firstId, { price: { amountMinor: 100, currency: 'HKD' } })]);
+    input.trip.budget = { amountMinor: 500, currency: 'HKD' };
+    const result = generatePlan(input);
+    expect(result.estimatedTotalCost).toEqual({ amountMinor: 100, currency: 'HKD' });
+    expect(result.warnings.some(warning => warning.code === 'UNKNOWN_FX')).toBe(false);
   });
 
   it('reports a known budget excess even if another price is unknown', () => {

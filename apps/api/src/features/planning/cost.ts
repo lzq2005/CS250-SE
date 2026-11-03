@@ -3,6 +3,8 @@ import type { Currency, FxRate, ItineraryDay, Money, PlanWarning, POI, TripConfi
 function convert(amount: Money, currency: Currency, rates: FxRate[]): bigint | null {
   if (!Number.isSafeInteger(amount.amountMinor) || amount.amountMinor < 0) return null;
   const minor = BigInt(amount.amountMinor);
+  // A known free item remains zero in every supported currency, even without FX.
+  if (minor === 0n) return 0n;
   if (amount.currency === currency) return minor;
   const rate = rates.find(r => r.from === amount.currency && r.to === currency && r.source !== null && r.source.trim() !== '');
   if (!rate || !/^\d+(\.\d+)?$/.test(rate.decimalRate)) return null;
