@@ -1,0 +1,38 @@
+import { test, expect } from '@playwright/test';
+test('A-04 creates, reloads and edits Trip through the real API', async ({ page }) => {
+  await page.goto('/src/features/trip/trip-preview.html');
+  await page.getByLabel('旅行名称', { exact: true }).fill(`A04 E2E ${Date.now()}`);
+  await page.getByLabel('开始日期', { exact: true }).fill('2028-02-29');
+  await page.getByLabel('结束日期', { exact: true }).fill('2028-02-29');
+  await page.getByLabel('结束日期', { exact: true }).blur();
+  await page.getByLabel('开始 2028-02-29', { exact: true }).fill('09:00');
+  await page.getByLabel('结束 2028-02-29', { exact: true }).fill('18:00');
+  await page.getByLabel('澳门出发点', { exact: true }).selectOption({ index: 1 });
+  await page.getByRole('button', { name: '保存旅行', exact: true }).click();
+  await expect(page.getByRole('status')).toHaveText('旅行已保存');
+  await expect(page.getByLabel('澳门出发点', { exact: true })).not.toHaveValue('manual');
+  const list = await page.request.get('/api/v1/trips'); const trips = (await list.json()).data.items;
+  const title = await page.getByLabel('旅行名称', { exact: true }).inputValue();
+  const trip = trips.find((t: { title: string }) => t.title === title); expect(trip.budget).toBeNull();
+  await page.reload(); await page.getByLabel('已保存的旅行', { exact: true }).selectOption(trip.id);
+  await page.getByRole('button', { name: '载入旅行' }).click();
+  await expect(page.getByLabel('旅行名称', { exact: true })).toHaveValue(title);
+  await page.getByLabel('旅行名称', { exact: true }).fill(title + ' updated');
+  await page.getByLabel('预算（留空表示未设置）', { exact: true }).fill('123.45');
+  await page.getByRole('button', { name: '保存旅行', exact: true }).click();
+  await expect(page.getByRole('status')).toHaveText('旅行已保存');
+  expect((await (await page.request.get(`/api/v1/trips/${trip.id}`)).json()).data.budget).toEqual({ amountMinor: 12345, currency: 'MOP' });
+});
+test('A-04 preserves the form and shows API validation failures', async ({ page }) => {
+  await page.goto('/src/features/trip/trip-preview.html');
+  await page.getByLabel('旅行名称', { exact: true }).fill('Manual invalid point');
+  await page.getByLabel('开始日期', { exact: true }).fill('2028-02-29');
+  await page.getByLabel('结束日期', { exact: true }).fill('2028-02-29'); await page.getByLabel('结束日期', { exact: true }).blur();
+  await page.getByLabel('开始 2028-02-29', { exact: true }).fill('09:00'); await page.getByLabel('结束 2028-02-29', { exact: true }).fill('18:00');
+  await page.getByLabel('澳门出发点', { exact: true }).selectOption('manual');
+  await page.getByLabel('位置名称', { exact: true }).fill('Mainland');
+  await page.getByLabel('纬度', { exact: true }).fill('22.27'); await page.getByLabel('经度', { exact: true }).fill('113.54');
+  await page.getByRole('button', { name: '保存旅行', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('origin.position');
+  await expect(page.getByLabel('旅行名称', { exact: true })).toHaveValue('Manual invalid point');
+});
