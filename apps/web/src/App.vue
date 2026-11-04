@@ -90,3 +90,5 @@ onUnmounted(() => window.removeEventListener('hashchange', navigate));
     </nav>
   </div>
 </template>
+
+<style scoped src="./styles/shell.css"></style>

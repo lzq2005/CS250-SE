@@ -24,11 +24,27 @@ App.vue composes the shell. shared/ui contains decorative icons. styles/shell.cs
 contains responsive tokens/styles. Existing health feedback remains visible under
 the service connection section. B-01 changes no backend files or dependencies.
 
+## CSS integration boundary
+
+`App.vue` loads `styles/shell.css` with Vue `scoped`. Generic heading/link/button
+and shell class selectors therefore apply to App-owned DOM, not another Vue
+component's internal elements. `style.css` retains only the existing Tailwind
+baseline, shared theme variables/font/page colors, and body margin/minimum width.
+Other owners may inherit the theme or override it in their own scoped components.
+App layout still constrains the available page width; this is an intentional shell
+boundary, not a promise that all future layouts need no integration work.
+
+Checked D's `feat/d/D-01-itinerary-display` component: its internal `h1`, `h2` and
+`.eyebrow` were potential collisions with the original global selectors. D's file
+is unchanged. A browser regression test now inserts independent child DOM inside
+the destination and verifies its heading/label typography is not overridden by B.
+Actual merged-component integration still needs B/D verification when D lands.
+
 ## B-01 validation 2026-11-04
 
 - `npm run lint`, `npm run typecheck`, `npm test` (5 tests), `npm run build`: passed.
-- B-owned Playwright config above: 4 passed using installed Chrome (two shell
-  navigation/mobile checks plus the unchanged two bootstrap health checks).
+- B-owned Playwright config above: 5 passed using installed Chrome (three shell
+  navigation/mobile/CSS-isolation checks plus the unchanged two bootstrap health checks).
 - Desktop and mobile layouts visually reviewed. All feature destinations remain
   development placeholders. No POI, favorite, target or publishing backend is implemented.
 - The existing root CI runs bootstrap E2E only. Run this B-owned config explicitly

@@ -61,3 +61,25 @@ test('mobile shell fits 320/390/768 px and supports keyboard navigation', async 
   await page.keyboard.press('Enter');
   await expect(page.locator('#main-content')).toBeFocused();
 });
+
+test('shell styles do not override a nested feature component', async ({ page }) => {
+  await page.goto('/#/trips');
+  // Nodes without App's scope attribute represent another Vue component's internals.
+  // Place them inside the destination to exercise .destination h1 as well as global
+  // h1/h2/.eyebrow selectors, even if that component loads its styles before B.
+  const result = await page.evaluate(() => {
+    const feature = document.createElement('article');
+    feature.style.cssText = 'font-size:17px; font-weight:400; line-height:1.8; letter-spacing:0.2px; color:rgb(91,44,132)';
+    feature.innerHTML = '<h1>Feature heading</h1><h2>Feature subheading</h2><p class="eyebrow">Feature label</p>';
+    document.querySelector('.destination-card')!.append(feature);
+    const values = Array.from(feature.children).map(el => {
+      const css = getComputedStyle(el);
+      return { size: css.fontSize, weight: css.fontWeight, color: css.color, lineHeight: css.lineHeight, letterSpacing: css.letterSpacing };
+    });
+    feature.remove();
+    return values;
+  });
+  for (const value of result) expect(value).toEqual({
+    size: '17px', weight: '400', color: 'rgb(91, 44, 132)', lineHeight: '30.6px', letterSpacing: '0.2px',
+  });
+});

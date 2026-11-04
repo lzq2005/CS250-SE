@@ -1,10 +1,4 @@
-:root {
-  font-family: "Segoe UI", "Microsoft YaHei", sans-serif; color: #163c69; background: #f0f7ff; font-synthesis: none;
-  --color-ink: #163c69; --color-muted: #5c7290; --color-accent: #2477c6;
-  --color-border: #d6e5f5; --color-surface: #fff; --radius-card: 18px;
-  --art-sun: #e9c782; --art-line: #b5d2f1; --art-building: #e5ebdc; --art-ink: #477865;
-}
-* { box-sizing: border-box; } body { margin: 0; min-width: 320px; }
+* { box-sizing: border-box; }
 a { color: inherit; text-decoration: none; } button { font: inherit; cursor: pointer; } button:disabled { cursor: wait; opacity: .6; }
 a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid #2477c6; outline-offset: 5px; }
 .app-icon { width: 24px; height: 24px; flex-shrink: 0; }
