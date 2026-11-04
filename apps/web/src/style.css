@@ -1,2 +1,2 @@
 @import "tailwindcss";
-:root { font-family: system-ui, sans-serif; color: #173530; background: #f4f7f5; }
+@import "./styles/shell.css";
