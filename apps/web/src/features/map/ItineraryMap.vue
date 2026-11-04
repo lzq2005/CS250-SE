@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import L, { type LayerGroup, type Map as LeafletMap } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { ItineraryDay, PlanResult, POI, PlannedStop } from '@tripmate/contracts';
+import type { ItineraryDay, PlanResult, POI } from '@tripmate/contracts';
 
 const props = defineProps<{
   plan: PlanResult;
@@ -32,6 +32,7 @@ const stopRows = computed(() => {
     stop,
     sequence: index + 1,
     poi: poiById.value.get(stop.poiId),
+    positionValid: hasValidCoordinates(poiById.value.get(stop.poiId)?.position),
   }));
 });
 
@@ -72,9 +73,22 @@ function markerIcon(sequence: number, poi: POI): L.DivIcon {
   });
 }
 
-function getCoordinate(stop: PlannedStop): L.LatLngExpression | null {
-  const poi = poiById.value.get(stop.poiId);
-  return poi ? [poi.position.lat, poi.position.lng] : null;
+function hasValidCoordinates(position: POI['position'] | undefined): boolean {
+  if (!position) return false;
+  return (
+    Number.isFinite(position.lat) &&
+    Number.isFinite(position.lng) &&
+    position.lat >= -90 &&
+    position.lat <= 90 &&
+    position.lng >= -180 &&
+    position.lng <= 180
+  );
+}
+
+function getCoordinate(poi: POI | undefined): L.LatLngExpression | null {
+  return poi && hasValidCoordinates(poi.position)
+    ? [poi.position.lat, poi.position.lng]
+    : null;
 }
 
 function renderMap(day: ItineraryDay | undefined): void {
@@ -88,7 +102,7 @@ function renderMap(day: ItineraryDay | undefined): void {
 
   day.stops.forEach((stop, index) => {
     const poi = poiById.value.get(stop.poiId);
-    const coordinate = getCoordinate(stop);
+    const coordinate = getCoordinate(poi);
 
     if (!poi || !coordinate) {
       previousCoordinate = null;
@@ -97,16 +111,17 @@ function renderMap(day: ItineraryDay | undefined): void {
 
     coordinates.push(coordinate);
 
-    L.marker(coordinate, {
+    const marker = L.marker(coordinate, {
       icon: markerIcon(index + 1, poi),
       title: `第 ${index + 1} 站：${poi.name}`,
       keyboard: true,
-    })
-      .bindTooltip(`第 ${index + 1} 站 · ${poi.name}`, {
-        direction: 'top',
-        offset: [0, -18],
-      })
-      .addTo(routeLayer!);
+    });
+    const tooltip = document.createElement('span');
+    tooltip.textContent = `第 ${index + 1} 站 · ${poi.name}`;
+    marker.bindTooltip(tooltip, {
+      direction: 'top',
+      offset: [0, -18],
+    }).addTo(routeLayer!);
 
     if (previousCoordinate) {
       L.polyline([previousCoordinate, coordinate], {
@@ -182,6 +197,9 @@ onBeforeUnmount(() => {
         <p class="eyebrow">ITINERARY GEOGRAPHY</p>
         <h1 id="itinerary-map-heading">行程地图</h1>
         <p class="intro">编号 marker、行程站点和路线顺序始终来自同一份 PlanResult。</p>
+        <p data-testid="route-disclaimer" class="route-disclaimer">
+          连线仅表示行程顺序，不代表真实道路路线。
+        </p>
       </div>
       <span class="order-note">编号 = 当前日行程顺序</span>
     </header>
@@ -230,10 +248,13 @@ onBeforeUnmount(() => {
             <span class="sequence-number" aria-hidden="true">{{ row.sequence }}</span>
             <div>
               <strong>{{ row.poi?.name ?? '地点坐标不可用' }}</strong>
-              <small v-if="row.poi">
+              <small v-if="row.poi && row.positionValid">
                 {{ row.stop.start ?? '待确定' }} - {{ row.stop.end ?? '待确定' }}
               </small>
-              <small v-else class="missing">请检查 POI 数据后重新加载地图。</small>
+              <small v-else-if="row.poi" class="missing">
+                地点坐标无效，请检查经纬度数据后重新加载地图。
+              </small>
+              <small v-else class="missing">地点坐标不可用，请检查 POI 数据后重新加载地图。</small>
             </div>
           </li>
         </ol>
@@ -300,6 +321,13 @@ h1 {
   margin-bottom: 0;
   color: var(--muted);
   line-height: 1.55;
+}
+
+.route-disclaimer {
+  margin: 10px 0 0;
+  color: #835c20;
+  font-size: 12px;
+  font-weight: 650;
 }
 
 .order-note {
