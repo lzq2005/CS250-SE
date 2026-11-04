@@ -21,3 +21,13 @@ The preview uses `d01-fixture.ts`, which is explicitly test data and is not
 connected to Member C's Planning API. Member B can integrate the component when
 the shared page route is available without changing this component's data
 contract or global styles.
+
+Travel legs are matched to stops by `TravelLeg.toPoiId`, not by an assumed array
+position. A stop with no matching leg, or with ambiguous duplicate matches, shows
+`交通资料不可用` rather than borrowing another stop's transport information.
+
+The defensive boundary fixture is available at:
+
+```text
+/src/features/itinerary/itinerary-preview.html?scenario=leg-boundary
+```

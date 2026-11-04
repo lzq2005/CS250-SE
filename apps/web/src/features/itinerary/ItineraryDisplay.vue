@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type {
+  ItineraryDay,
   KnownStatus,
   PlanResult,
   PlanWarning,
@@ -63,8 +64,9 @@ function getPoiName(poiId: string): string {
   return poiById.value.get(poiId)?.name ?? '地点资料不可用';
 }
 
-function getTravelLeg(dayIndex: number, stopIndex: number): TravelLeg | undefined {
-  return orderedDays.value[dayIndex]?.legs[stopIndex];
+function getTravelLeg(day: ItineraryDay, poiId: string): TravelLeg | undefined {
+  const matchingLegs = day.legs.filter((leg) => leg.toPoiId === poiId);
+  return matchingLegs.length === 1 ? matchingLegs[0] : undefined;
 }
 
 function travelOrigin(leg: TravelLeg | undefined): string {
@@ -139,17 +141,17 @@ function formatCost(value: TravelLeg['estimatedCost']): string | null {
             class="stop-item"
           >
             <div data-testid="travel-leg" class="travel-leg">
-              <template v-if="getTravelLeg(dayIndex, stopIndex)">
-                <span class="transport-mode">{{ modeLabels[getTravelLeg(dayIndex, stopIndex)!.mode] }}</span>
-                <span>{{ travelOrigin(getTravelLeg(dayIndex, stopIndex)) }}</span>
+              <template v-if="getTravelLeg(day, stop.poiId)">
+                <span class="transport-mode">{{ modeLabels[getTravelLeg(day, stop.poiId)!.mode] }}</span>
+                <span>{{ travelOrigin(getTravelLeg(day, stop.poiId)) }}</span>
                 <span aria-hidden="true">·</span>
-                <span>{{ formatDuration(getTravelLeg(dayIndex, stopIndex)!.durationMinutes) }}</span>
-                <span v-if="formatCost(getTravelLeg(dayIndex, stopIndex)!.estimatedCost)" aria-hidden="true">·</span>
-                <span v-if="formatCost(getTravelLeg(dayIndex, stopIndex)!.estimatedCost)">
-                  {{ formatCost(getTravelLeg(dayIndex, stopIndex)!.estimatedCost) }}
+                <span>{{ formatDuration(getTravelLeg(day, stop.poiId)!.durationMinutes) }}</span>
+                <span v-if="formatCost(getTravelLeg(day, stop.poiId)!.estimatedCost)" aria-hidden="true">·</span>
+                <span v-if="formatCost(getTravelLeg(day, stop.poiId)!.estimatedCost)">
+                  {{ formatCost(getTravelLeg(day, stop.poiId)!.estimatedCost) }}
                 </span>
                 <span class="estimate-status">
-                  {{ estimateLabels[getTravelLeg(dayIndex, stopIndex)!.estimateStatus] }}
+                  {{ estimateLabels[getTravelLeg(day, stop.poiId)!.estimateStatus] }}
                 </span>
               </template>
               <span v-else>交通资料不可用</span>

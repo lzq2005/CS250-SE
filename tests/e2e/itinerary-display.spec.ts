@@ -82,4 +82,31 @@ test.describe('D-01 itinerary display fixture preview', () => {
 
     expect(layout.contentWidth).toBeLessThanOrEqual(layout.viewportWidth);
   });
+
+  test('matches transport by destination when legs are reordered or missing', async ({ page }) => {
+    await page.goto('/src/features/itinerary/itinerary-preview.html?scenario=leg-boundary');
+
+    const ruinsLeg = page
+      .getByTestId('stop-item')
+      .filter({ has: page.getByRole('heading', { level: 3, name: '大三巴牌坊' }) })
+      .getByTestId('travel-leg');
+    await expect(ruinsLeg).toContainText('步行');
+    await expect(ruinsLeg).toContainText('从行程起点');
+    await expect(ruinsLeg).toContainText('12 分钟');
+    await expect(ruinsLeg).not.toContainText('公交');
+
+    const museumLeg = page
+      .getByTestId('stop-item')
+      .filter({ has: page.getByRole('heading', { level: 3, name: '澳门博物馆' }) })
+      .getByTestId('travel-leg');
+    await expect(museumLeg).toContainText('公交');
+    await expect(museumLeg).toContainText('从大三巴牌坊出发');
+    await expect(museumLeg).not.toContainText('步行');
+
+    const missingDayLeg = page
+      .getByTestId('itinerary-day-2026-11-04')
+      .getByTestId('travel-leg');
+    await expect(missingDayLeg).toContainText('交通资料不可用');
+    await expect(missingDayLeg).not.toContainText('出租车');
+  });
 });
