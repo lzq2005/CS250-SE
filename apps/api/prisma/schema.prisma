@@ -1,12 +1,117 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "sqlite"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
-// Bootstrap metadata only. Trip/POI/Itinerary domain schema needs owner review.
+
+// Retained unchanged for bootstrap installations and health regression tests.
 model DemoWorkspace {
-  id String @id
+  id        String   @id
   createdAt DateTime @default(now())
+}
+
+// Local dates/times remain strings in Asia/Macau; never UTC-convert them.
+model Trip {
+  id                String           @id @default(uuid())
+  title             String
+  startDate         String
+  endDate           String
+  originLabel       String
+  originLat         Float
+  originLng         Float
+  originSource      String
+  interests         Json
+  budgetAmountMinor BigInt?
+  budgetCurrency    String?
+  pace              String           @default("standard")
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  dayWindows        DayWindow[]
+  companions        Companion[]
+  targets           TripTarget[]
+  itineraries       SavedItinerary[]
+}
+
+model DayWindow {
+  id     String @id @default(uuid())
+  tripId String
+  date   String
+  start  String
+  end    String
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@unique([tripId, date])
+}
+
+// Separate from TripConfig/PlannerInput. Same names are intentionally allowed.
+model Companion {
+  id        String   @id @default(uuid())
+  tripId    String
+  name      String
+  createdAt DateTime @default(now())
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId, createdAt, id])
+}
+
+model POI {
+  id                    String       @id @default(uuid())
+  name                  String
+  category              String
+  tags                  Json
+  lat                   Float
+  lng                   Float
+  address               String
+  // SQL NULL = unknown; JSON [] = known closed all week.
+  openingHours          Json?
+  suggestedVisitMinutes Int?
+  priceAmountMinor      BigInt?
+  priceCurrency         String?
+  verification          String
+  sourceUrl             String?
+  checkedAt             DateTime?
+  bookingNote           String?
+  targets               TripTarget[]
+  favorites             Favorite[]
+}
+
+model TripTarget {
+  id        String   @id @default(uuid())
+  tripId    String
+  poiId     String
+  // B allocates max(position)+1 in the Add transaction. Order by position.
+  position  Int
+  createdAt DateTime @default(now())
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  poi       POI      @relation(fields: [poiId], references: [id], onDelete: Restrict)
+
+  @@unique([tripId, poiId])
+  @@unique([tripId, position])
+  @@index([poiId])
+}
+
+// One local demo workspace; no invented user/auth foreign key.
+model Favorite {
+  id        String   @id @default(uuid())
+  poiId     String   @unique
+  createdAt DateTime @default(now())
+  poi       POI      @relation(fields: [poiId], references: [id], onDelete: Restrict)
+}
+
+model SavedItinerary {
+  id            String   @id @default(uuid())
+  tripId        String
+  version       Int      @default(1)
+  // Shared PlannerInput/PlanResult/TimeOverride[] JSON, not live POI relations.
+  input         Json
+  result        Json
+  timeOverrides Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  trip          Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId, createdAt, id])
 }
