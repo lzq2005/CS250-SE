@@ -1,0 +1,100 @@
+* { box-sizing: border-box; }
+a { color: inherit; text-decoration: none; } button { font: inherit; cursor: pointer; } button:disabled { cursor: wait; opacity: .6; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid #2477c6; outline-offset: 5px; }
+.app-icon { width: 24px; height: 24px; flex-shrink: 0; }
+.skip-link { position: fixed; top: -80px; left: 16px; z-index: 20; padding: 12px; background: white; }.skip-link:focus { top: 12px; }
+.site-header { max-width: 1160px; margin: auto; padding: 28px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); }
+.brand { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 700; letter-spacing: -.7px; }
+.brand-mark { display: grid; place-items: center; border-radius: 13px; width: 40px; height: 40px; background: var(--color-ink); color: #fff; }
+.brand-city { font-size: 10px; letter-spacing: 2px; margin-left: 5px; font-weight: 500; }
+.header-note { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--color-muted); }
+.small-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #9c7b44; }.online, .header-note .small-dot { background: #4d97da; }
+.page-content { max-width: 1160px; margin: auto; padding: 0 40px 130px; outline: none; }
+.hero { min-height: 410px; display: grid; grid-template-columns: 1.12fr 1fr; align-items: center; gap: 20px; padding: 52px 0 44px; }
+.eyebrow { color: var(--color-muted); font-size: 10px; letter-spacing: 2.3px; font-weight: 600; margin: 0 0 18px; }
+h1 { margin: 0; font-size: clamp(32px, 3.8vw, 48px); line-height: 1.4; font-weight: 650; letter-spacing: -1.8px; }.accent { color: #487fb8; }
+.hero-description { color: var(--color-muted); line-height: 1.9; font-size: 14px; margin: 22px 0; }
+.primary-button, .secondary-button { display: inline-flex; align-items: center; justify-content: center; gap: 25px; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; min-height: 48px; }
+.primary-button { background: var(--color-ink); color: white; }.primary-button:hover { background: var(--color-accent); }
+.primary-button .app-icon, .secondary-button .app-icon { width: 18px; height: 18px; }
+.hero-caption { display: block; margin-top: 14px; font-size: 11px; color: var(--color-muted); }
+.city-art { background: radial-gradient(ellipse, #f0f0e5, transparent 70%); }.city-art svg { width: 100%; display: block; }
+.art-label { display: block; text-align: right; color: var(--color-muted); letter-spacing: 2px; font-size: 9px; padding-right: 25px; }
+.section-heading { display: flex; justify-content: space-between; gap: 16px; align-items: end; margin-bottom: 22px; }.section-heading .eyebrow { margin-bottom: 8px; }
+h2 { font-size: 22px; font-weight: 600; margin: 0; }.section-note { color: var(--color-muted); font-size: 12px; }
+.shortcut-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.shortcut-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-card); padding: 22px 18px; position: relative; min-height: 172px; transition: border-color .15s, transform .15s; }
+.shortcut-card:hover { border-color: #76a9de; transform: translateY(-3px); }
+.shortcut-icon { width: 42px; height: 42px; background: #e6f1ff; border-radius: 12px; display: grid; place-items: center; margin-bottom: 18px; }
+.shortcut-text { display: flex; flex-direction: column; gap: 7px; }.shortcut-text strong { font-size: 15px; font-weight: 600; }.shortcut-text > span { color: var(--color-muted); font-size: 11px; line-height: 1.6; }
+.card-arrow { position: absolute; top: 31px; right: 17px; width: 17px; height: 17px; color: #7094bb; }
+.explore-note { margin-top: 24px; padding: 22px 0; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px; color: var(--color-muted); }.explore-note p { margin: 0; font-size: 13px; }.explore-note a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 4px; }.explore-note > span { margin-left: auto; font-size: 11px; }
+.service-details { margin-top: 26px; color: var(--color-muted); font-size: 12px; }.service-details summary { cursor: pointer; padding: 8px 0; width: fit-content; }.service-details .small-dot { margin: 0 7px; }
+.service-content { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 6px 0; }.service-content p { margin: 0; }
+.text-button { border: 1px solid var(--color-border); background: white; padding: 10px 14px; border-radius: 8px; min-height: 44px; }
+.page-footer { display: flex; justify-content: space-between; gap: 12px; font-size: 9px; letter-spacing: 2px; color: var(--color-muted); margin-top: 24px; }.page-footer span { letter-spacing: 0; }
+.bottom-nav { position: fixed; z-index: 10; left: 50%; bottom: 0; transform: translateX(-50%); width: min(100%, 1160px); display: grid; grid-template-columns: repeat(4, 1fr); padding: 12px 20px max(12px, env(safe-area-inset-bottom)); background: #f0f7ff; border-top: 1px solid var(--color-border); }
+.bottom-nav a { display: flex; flex-direction: column; gap: 4px; align-items: center; color: var(--color-muted); font-size: 11px; min-height: 58px; border-radius: 10px; }.bottom-nav a.active { color: var(--color-ink); background: #dcebff; }.bottom-nav .app-icon { margin-top: 5px; width: 21px; height: 21px; }.nav-english { font-size: 8px; letter-spacing: 1px; }
+.destination { padding-top: 24px; min-height: 600px; }.back-link { display: inline-block; font-size: 12px; color: var(--color-muted); margin-bottom: 18px; padding: 8px 0; }.destination h1 { font-size: 36px; }.destination-description { color: var(--color-muted); line-height: 1.9; font-size: 14px; }
+.destination-card { background: var(--color-surface); border: 1px solid #dfebf7; border-radius: 24px; padding: 36px; box-shadow: 0 12px 40px #274e7e0b; }
+.empty-panel { margin-top: 28px; padding: 48px 24px; text-align: center; border: 1px dashed #cbd9e9; border-radius: var(--radius-card); background: #fafcff; }.empty-icon { display: inline-grid; place-items: center; background: #eaf3ff; padding: 16px; border-radius: 50%; margin-bottom: 20px; }.empty-panel h2 { font-size: 20px; }.empty-panel p { color: var(--color-muted); font-size: 13px; line-height: 1.8; margin: 14px auto 24px; max-width: 420px; }.secondary-button { background: white; border: 1px solid var(--color-border); }
+.mine-links { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }.mine-links a { display: flex; align-items: center; justify-content: space-between; padding: 20px; background: white; border: 1px solid var(--color-border); border-radius: 12px; font-size: 14px; }
+@media (max-width: 760px) {
+  .site-header { padding: 20px 24px; }.page-content { padding: 0 24px 125px; }.shortcut-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.hero { gap: 0; }.header-note { font-size: 10px; }.section-note { display: none; }
+}
+@media (max-width: 520px) {
+  .site-header { padding: 18px 20px; }.page-content { padding-right: 20px; padding-left: 20px; }.brand { font-size: 20px; }.brand-city { font-size: 8px; }.header-note { display: none; }
+  .hero { padding: 34px 0 28px; grid-template-columns: 1fr; position: relative; }.hero-copy { z-index: 1; }.hero h1 { font-size: 35px; }.hero-description { font-size: 13px; margin: 18px 0; }
+  .city-art { width: 155px; position: absolute; bottom: 18px; right: -4px; opacity: .4; pointer-events: none; }.art-label { display: none; }.hero-caption { max-width: 180px; font-size: 10px; }.primary-button { gap: 18px; }
+  .section-heading h2 { font-size: 20px; }.shortcut-card { padding: 18px 14px; min-height: 164px; }.shortcut-text strong { font-size: 14px; }.card-arrow { right: 12px; width: 14px; }
+  .explore-note { align-items: start; }.explore-note > span { display: none; }.explore-note p { line-height: 1.8; }.page-footer { flex-direction: column; }.destination h1 { font-size: 30px; }.destination { min-height: 520px; }.destination-card { padding: 24px 18px; border-radius: 20px; }.mine-links { grid-template-columns: 1fr; }.empty-panel { padding: 32px 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .shortcut-card { transition: none; }.shortcut-card:hover { transform: none; } }
+
+/* B-01 home: sunny Macau photography and four distinct feature choices. */
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.home-scene { position: relative; isolation: isolate; overflow: hidden; border-radius: 26px; margin-top: 24px; padding: 42px; background: #e4f1ff; box-shadow: 0 16px 44px #163c690a; }
+.home-scene::before { content: ""; position: absolute; z-index: -2; inset: 0 0 0 32%; background: url('../shared/ui/assets/st-pauls-blue-sky.webp') center 12% / cover no-repeat; }
+.home-scene::after { content: ""; position: absolute; z-index: -1; inset: 0; background: linear-gradient(90deg, #eaf4ff 0%, #eaf4fff0 26%, #eaf4ff66 45%, #eaf4ff00 68%), linear-gradient(0deg, #183d6b20, transparent 45%); }
+.home-scene .hero { display: block; position: relative; padding: 0 0 35px; min-height: 245px; }
+.home-scene h1 { font-size: clamp(32px, 3.5vw, 44px); line-height: 1.45; letter-spacing: -1.3px; }
+.home-scene .accent { color: #204f85; }
+.home-scene .eyebrow { color: #446b98; margin-bottom: 18px; }
+.home-scene .hero-description { color: #3f6085; margin: 18px 0 0; }
+.photo-location { position: absolute; top: 8px; right: 0; display: flex; align-items: center; gap: 6px; color: #204b7a; font-size: 11px; background: #ffffffe8; border: 1px solid #ffffffba; border-radius: 30px; padding: 8px 12px; }
+.photo-location .app-icon { width: 14px; height: 14px; }
+.journey-choices { position: relative; }
+.home-scene .shortcut-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.home-scene .shortcut-card { padding: 22px; min-height: 162px; border: 1px solid #ffffffed; box-shadow: 0 5px 18px #18342e10; backdrop-filter: blur(12px); }
+.home-scene .shortcut-card:hover { border-color: var(--tile-color); box-shadow: 0 9px 24px #18342e24; }
+.shortcut-trip { --tile-color: #b8551d; background: #ffe5d3f5; }
+.shortcut-favorites { --tile-color: #bf3c55; background: #ffe7e9f2; }
+.shortcut-trips { --tile-color: #7650b3; background: #eee2fff5; }
+.shortcut-plaza { --tile-color: #a65c08; background: #fff1cef2; }
+.home-scene .shortcut-icon { color: var(--tile-color); background: #ffffffa8; width: 44px; height: 44px; border-radius: 14px; margin-bottom: 14px; }
+.home-scene .shortcut-icon .app-icon { width: 27px; height: 27px; stroke-width: 1.9; }
+.home-scene .shortcut-text strong { font-size: 17px; color: #1d406a; }
+.home-scene .shortcut-text > span { color: #46648a; font-size: 12px; }
+.home-scene .card-arrow { color: var(--tile-color); right: 20px; }
+.image-info { margin-top: 18px; color: var(--color-muted); font-size: 11px; line-height: 1.8; }
+.image-info summary { cursor: pointer; width: fit-content; padding: 6px 0; }
+.image-info a { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 760px) {
+  .home-scene .shortcut-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-scene { padding: 28px; }.home-scene::before { left: 15%; }.home-scene .hero { min-height: 250px; }
+  .photo-location { position: static; width: fit-content; margin-top: 18px; }.home-scene .hero-description { max-width: 360px; }
+}
+@media (max-width: 520px) {
+  .page-content:has(.home-scene) { padding-left: 12px; padding-right: 12px; }
+  .home-scene { margin-top: 12px; padding: 24px 14px 14px; border-radius: 22px; }
+  .home-scene::before { inset: 0; background-position: center top; }
+  .home-scene::after { background: linear-gradient(180deg, #eaf4ffcc 0%, #eaf4ff65 18%, #eaf4ff08 42%, #1a447222 100%); }
+  .home-scene .hero { min-height: 272px; padding: 0 6px 26px; }
+  .home-scene h1 { font-size: 30px; line-height: 1.5; text-shadow: 0 1px 12px #ffffffd6; }
+  .home-scene .eyebrow { font-size: 8px; letter-spacing: 1.5px; margin-bottom: 16px; }
+  .home-scene .hero-description { font-size: 12px; color: #244568; text-shadow: 0 1px 7px white; }
+  .photo-location { font-size: 10px; padding: 6px 9px; margin-top: 14px; }
+  .home-scene .shortcut-grid { gap: 12px; }.home-scene .shortcut-card { min-height: 152px; padding: 17px 12px; }
+  .home-scene .shortcut-text strong { font-size: 15px; }.home-scene .shortcut-text > span { font-size: 11px; }
+  .home-scene .card-arrow { right: 11px; top: 29px; width: 14px; }
+}
