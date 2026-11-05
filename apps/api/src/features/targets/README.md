@@ -1,5 +1,7 @@
 # B-04 — Trip Targets backend
 
+按组长最新顺序准备的导航／activeTrip／Targets 集成方案见 [INTEGRATION_PLAN.md](./INTEGRATION_PLAN.md)。方案不等于已接入；B-01、PR #10 及 A 的手动 Seed／注册按依赖顺序处理。
+
 Owner B / Xia Youran. Uses the existing Trip/POI/TripTarget tables and shared `TargetsView`, preserving API Contract v1.1 REVISED semantics. No Schema/migration or contract changes.
 
 ## Interfaces
