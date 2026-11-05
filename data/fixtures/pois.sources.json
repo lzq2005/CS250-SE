@@ -1,0 +1,207 @@
+{
+  "reviewedOn": "2026-11-04",
+  "purpose": "首批5个真实POI的来源与审核元数据；pois.curated-draft.json 为结构完整的待审 POI[]，未获团队批准、未导入数据库。",
+  "accessMethod": "网页工具读取正文，可能为缓存版本；不保证现场实时开放",
+  "records": [
+    {
+      "name": "郑家大屋",
+      "sourceUrl": "https://www.culturalheritage.mo/en/detail/102524",
+      "addressAsPublished": "Travessa de António da Silva, no. 10, Macau",
+      "hoursSummary": "10:00–18:00，17:30 后停止入场，周三关闭；其余星期包括公众假期开放。",
+      "admissionSummary": "官方页面注明免费入场。",
+      "scopeNote": "普通参观；不将导赏或场地使用规则解释为所有游客必须预约。",
+      "position": {
+        "lat": 22.1885481,
+        "lng": 113.5343871
+      },
+      "suggestedVisitMinutes": null,
+      "pending": [
+        "团队审核坐标代表位置与参观范围；不是入口精确导航",
+        "真实库已有记录去重与稳定 ID 最终确认；当前仅发现 D 的合成预览同名条目"
+      ],
+      "seedReady": false,
+      "candidateId": "273024e3-ae0c-5172-a486-e460efb96639",
+      "additionalSourceUrls": [
+        "https://www.wh.mo/mandarinhouse/en/location/"
+      ],
+      "positionEvidence": {
+        "sourceUrl": "https://api.openstreetmap.org/api/0.6/way/404235920/full.json",
+        "osmObjectUrl": "https://www.openstreetmap.org/way/404235920",
+        "wayId": 404235920,
+        "wayVersion": 9,
+        "retrievedAt": "2026-11-04T14:19:27.695202Z",
+        "coordinateSystem": "WGS84",
+        "method": "area centroid of downloaded OSM closed way, checked inside polygon",
+        "entranceVerified": false,
+        "status": "estimated",
+        "snapshotFile": "pois.geometry.json"
+      },
+      "reviewStatus": "structured-draft-pending-team-review",
+      "structuredFixtureFile": "pois.curated-draft.json"
+    },
+    {
+      "name": "卢家大屋",
+      "sourceUrl": "https://www.culturalheritage.mo/en/detail/102523",
+      "addressAsPublished": "Travessa da Sé, no. 7",
+      "hoursSummary": "10:00–18:00，17:30 后停止入场，周一关闭；其余星期包括公众假期开放。",
+      "admissionSummary": "官方页面注明免费入场。",
+      "scopeNote": "普通参观；导赏另有场次，不能用导赏时段替代全部营业时间。",
+      "position": {
+        "lat": 22.1942349,
+        "lng": 113.5412366
+      },
+      "suggestedVisitMinutes": null,
+      "pending": [
+        "团队审核坐标代表位置与参观范围；不是入口精确导航",
+        "真实库已有记录去重与稳定 ID 最终确认；当前仅发现 D 的合成预览同名条目"
+      ],
+      "seedReady": false,
+      "candidateId": "11930ad8-8106-5262-8350-aff2f9b0e65f",
+      "positionEvidence": {
+        "sourceUrl": "https://api.openstreetmap.org/api/0.6/way/192573681/full.json",
+        "osmObjectUrl": "https://www.openstreetmap.org/way/192573681",
+        "wayId": 192573681,
+        "wayVersion": 8,
+        "retrievedAt": "2026-11-04T14:19:16.558042Z",
+        "coordinateSystem": "WGS84",
+        "method": "area centroid of downloaded OSM closed way, checked inside polygon",
+        "entranceVerified": false,
+        "status": "estimated",
+        "snapshotFile": "pois.geometry.json"
+      },
+      "reviewStatus": "structured-draft-pending-team-review",
+      "structuredFixtureFile": "pois.curated-draft.json"
+    },
+    {
+      "name": "大三巴牌坊",
+      "sourceUrl": "https://www.culturalheritage.mo/en/detail/102522",
+      "additionalSourceUrls": [
+        "https://www.wh.gov.mo/en/content/visitor/"
+      ],
+      "addressAsPublished": "Largo da Companhia de Jesus",
+      "hoursSummary": "汇总页区分外立面全天可见、遗址 09:00–18:00（17:30 停止入场）、博物馆及墓室另有周二下午关闭规则。",
+      "admissionSummary": "公开参观详情页注明免费入场。",
+      "scopeNote": "范围为大三巴地标／遗址复合参观，不包含大炮台。外立面全天可见，遗址及博物馆另有入场时段；不存在可靠的统一窗口，openingHours 保留未知，不表示全天开放。博物馆及墓室周二下午另有限制。",
+      "position": {
+        "lat": 22.1974569,
+        "lng": 113.5408602
+      },
+      "suggestedVisitMinutes": null,
+      "pending": [
+        "团队审核坐标代表位置与参观范围；不是入口精确导航",
+        "真实库已有记录去重与稳定 ID 最终确认；当前仅发现 D 的合成预览同名条目"
+      ],
+      "seedReady": false,
+      "candidateId": "8913d2bd-feaf-509d-8c02-560ef2e41510",
+      "positionEvidence": {
+        "sourceUrl": "https://api.openstreetmap.org/api/0.6/way/192183185/full.json",
+        "osmObjectUrl": "https://www.openstreetmap.org/way/192183185",
+        "wayId": 192183185,
+        "wayVersion": 14,
+        "retrievedAt": "2026-11-04T14:19:29.358145Z",
+        "coordinateSystem": "WGS84",
+        "method": "area centroid of downloaded OSM closed way, checked inside polygon",
+        "entranceVerified": false,
+        "status": "estimated",
+        "snapshotFile": "pois.geometry.json"
+      },
+      "reviewStatus": "structured-draft-pending-team-review",
+      "structuredFixtureFile": "pois.curated-draft.json"
+    },
+    {
+      "name": "东望洋炮台及灯塔",
+      "sourceUrl": "https://www.culturalheritage.mo/en/detail/102521",
+      "additionalSourceUrls": [
+        "https://www.wh.gov.mo/en/content/visitor/",
+        "https://www.culture.gov.mo/en/GuiaFortress"
+      ],
+      "addressAsPublished": "Guia Hill",
+      "hoursSummary": "炮台及资讯中心 09:00–18:00，17:30 后停止入场；教堂 10:00–17:00；汇总页注明灯塔不向公众开放。",
+      "admissionSummary": "公开参观详情页注明免费入场。",
+      "scopeNote": "范围为东望洋炮台地标及外部参观，不承诺进入灯塔。炮台及资讯中心 09:00–18:00、17:30 停止入场；教堂 10:00–17:00；灯塔内部不开放。不同区域不合并为统一窗口，openingHours 保留未知。",
+      "position": {
+        "lat": 22.1965806,
+        "lng": 113.549691
+      },
+      "suggestedVisitMinutes": null,
+      "pending": [
+        "团队审核坐标代表位置与参观范围；不是入口精确导航",
+        "真实库已有记录去重与稳定 ID 最终确认；当前仅发现 D 的合成预览同名条目"
+      ],
+      "seedReady": false,
+      "candidateId": "24775c63-c4f7-51de-81d8-5b4b83481aba",
+      "positionEvidence": {
+        "sourceUrl": "https://api.openstreetmap.org/api/0.6/way/404669396/full.json",
+        "osmObjectUrl": "https://www.openstreetmap.org/way/404669396",
+        "wayId": 404669396,
+        "wayVersion": 10,
+        "retrievedAt": "2026-11-04T14:19:30.717813Z",
+        "coordinateSystem": "WGS84",
+        "method": "area centroid of downloaded OSM closed way, checked inside polygon",
+        "entranceVerified": false,
+        "status": "estimated",
+        "snapshotFile": "pois.geometry.json"
+      },
+      "reviewStatus": "structured-draft-pending-team-review",
+      "structuredFixtureFile": "pois.curated-draft.json"
+    },
+    {
+      "name": "妈阁庙",
+      "sourceUrl": "https://www.wh.gov.mo/en/site/detail/1",
+      "additionalSourceUrls": [
+        "https://www.wh.gov.mo/en/content/visitor/",
+        "https://www.macaotourism.gov.mo/en/sightseeing/macao-world-heritage/a-ma-temple",
+        "https://www.macaotourism.gov.mo/en/sightseeing/temples/a-ma-temple"
+      ],
+      "addressAsPublished": "澳门妈阁山西坡",
+      "hoursSummary": null,
+      "admissionSummary": null,
+      "scopeNote": "已读文化局详情及汇总为 07:00–18:00，旅游局检索片段为 08:00–18:00，直接打开旅游局页未取得景点正文；未解决前营业时间保持未知。",
+      "position": {
+        "lat": 22.1860752,
+        "lng": 113.5312645
+      },
+      "suggestedVisitMinutes": null,
+      "pending": [
+        "团队审核坐标代表位置与参观范围；不是入口精确导航",
+        "真实库已有记录去重与稳定 ID 最终确认；当前仅发现 D 的合成预览同名条目",
+        "妈阁庙营业起始时间差异未解决；费用未知已合法保留 null"
+      ],
+      "seedReady": false,
+      "candidateId": "dc3578b4-eed7-56f4-9f2b-6c627d6cfb93",
+      "positionEvidence": {
+        "sourceUrl": "https://api.openstreetmap.org/api/0.6/way/192187333/full.json",
+        "osmObjectUrl": "https://www.openstreetmap.org/way/192187333",
+        "wayId": 192187333,
+        "wayVersion": 14,
+        "retrievedAt": "2026-11-04T14:19:32.044141Z",
+        "coordinateSystem": "WGS84",
+        "method": "area centroid of downloaded OSM closed way, checked inside polygon",
+        "entranceVerified": false,
+        "status": "estimated",
+        "snapshotFile": "pois.geometry.json"
+      },
+      "reviewStatus": "structured-draft-pending-team-review",
+      "structuredFixtureFile": "pois.curated-draft.json"
+    }
+  ],
+  "readyPOICount": 0,
+  "structuredReviewCount": 5,
+  "teamApprovedCount": 0,
+  "importedCount": 0,
+  "coordinateAttribution": "© OpenStreetMap contributors",
+  "coordinateLicense": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "coordinateAttributionUrl": "https://www.openstreetmap.org/copyright",
+  "limitations": [
+    "估计坐标代表地物，不保证入口或无障碍路线",
+    "网页来源可能为缓存；checkedAt 是资料检查时间，不是现场验证时间",
+    "首次5条均为history，不代表30候选或四类别全部完成"
+  ],
+  "readyPOICountMeaning": "团队已批准可进入 Seed 接入的数量；与结构完整待审数量不同",
+  "canonicalIdReview": {
+    "existingProductionFixtureFound": false,
+    "sameNameTestFixture": "apps/web/src/features/itinerary/d01-fixture.ts",
+    "sameNameTestId": "11111111-1111-4111-8111-111111111111",
+    "action": "沿用候选UUID，未修改D测试；正式Seed前由B/A/D确认真实库规范ID"
+  }
+}

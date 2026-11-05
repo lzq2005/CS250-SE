@@ -1,0 +1,173 @@
+[
+  {
+    "id": "5d05b972-32e0-5bbf-941d-c60e7f48a0fc",
+    "name": "测试景点 Alpha",
+    "category": "history",
+    "tags": [
+      "SYNTHETIC_TEST_ONLY",
+      "tag-history"
+    ],
+    "position": {
+      "lat": 22.19,
+      "lng": 113.54
+    },
+    "address": "测试街道1，非真实地点",
+    "openingHours": null,
+    "suggestedVisitMinutes": null,
+    "price": null,
+    "verification": "unknown",
+    "sourceUrl": null,
+    "checkedAt": null,
+    "bookingNote": "仅合成测试数据，坐标不代表此名称存在的真实景点，不得正式导入。"
+  },
+  {
+    "id": "d2111ade-04e8-5375-8140-c046c012bb58",
+    "name": "测试景点 Beta",
+    "category": "history",
+    "tags": [
+      "SYNTHETIC_TEST_ONLY",
+      "tag-history"
+    ],
+    "position": {
+      "lat": 22.19,
+      "lng": 113.54
+    },
+    "address": "测试街道2，非真实地点",
+    "openingHours": [],
+    "suggestedVisitMinutes": null,
+    "price": {
+      "amountMinor": 0,
+      "currency": "MOP"
+    },
+    "verification": "unknown",
+    "sourceUrl": null,
+    "checkedAt": null,
+    "bookingNote": "仅合成测试数据，坐标不代表此名称存在的真实景点，不得正式导入。"
+  },
+  {
+    "id": "1415d677-a67c-50bb-a017-a795b1aff799",
+    "name": "测试美食 Gamma",
+    "category": "food",
+    "tags": [
+      "SYNTHETIC_TEST_ONLY",
+      "tag-food"
+    ],
+    "position": {
+      "lat": 22.19,
+      "lng": 113.54
+    },
+    "address": "测试街道3，非真实地点",
+    "openingHours": null,
+    "suggestedVisitMinutes": null,
+    "price": null,
+    "verification": "unknown",
+    "sourceUrl": null,
+    "checkedAt": null,
+    "bookingNote": "仅合成测试数据，坐标不代表此名称存在的真实景点，不得正式导入。"
+  },
+  {
+    "id": "e121f27a-ab79-5320-8baf-84e78f0686f3",
+    "name": "测试美食 Delta",
+    "category": "food",
+    "tags": [
+      "SYNTHETIC_TEST_ONLY",
+      "tag-food"
+    ],
+    "position": {
+      "lat": 22.19,
+      "lng": 113.54
+    },
+    "address": "测试街道4，非真实地点",
+    "openingHours": null,
+    "suggestedVisitMinutes": null,
+    "price": null,
+    "verification": "unknown",
+    "sourceUrl": null,
+    "checkedAt": null,
+    "bookingNote": "仅合成测试数据，坐标不代表此名称存在的真实景点，不得正式导入。"
+  },
+  {
+    "id": "47cc6cd8-58e9-53cc-953a-b1578ec53c5d",
+    "name": "测试商店 Epsilon",
+    "category": "shopping",
+    "tags": [
+      "SYNTHETIC_TEST_ONLY",
+      "tag-shopping"
+    ],
+    "position": {
+      "lat": 22.19,
+      "lng": 113.54
+    },
+    "address": "测试街道5，非真实地点",
+    "openingHours": null,
+    "suggestedVisitMinutes": null,
+    "price": null,
+    "verification": "unknown",
+    "sourceUrl": null,
+    "checkedAt": null,
+    "bookingNote": "仅合成测试数据，坐标不代表此名称存在的真实景点，不得正式导入。"
+  },
+  {
+    "id": "59b09f1e-e14b-5f49-8d75-189ace78b6db",
+    "name": "测试商店 Zeta",
+    "category": "shopping",
+    "tags": [
+      "SYNTHETIC_TEST_ONLY",
+      "tag-shopping"
+    ],
+    "position": {
+      "lat": 22.19,
+      "lng": 113.54
+    },
+    "address": "测试街道6，非真实地点",
+    "openingHours": null,
+    "suggestedVisitMinutes": null,
+    "price": null,
+    "verification": "unknown",
+    "sourceUrl": null,
+    "checkedAt": null,
+    "bookingNote": "仅合成测试数据，坐标不代表此名称存在的真实景点，不得正式导入。"
+  },
+  {
+    "id": "e2c15293-0f46-5813-8f92-cb3b83a62215",
+    "name": "测试公园 Eta",
+    "category": "nature",
+    "tags": [
+      "SYNTHETIC_TEST_ONLY",
+      "tag-nature"
+    ],
+    "position": {
+      "lat": 22.19,
+      "lng": 113.54
+    },
+    "address": "测试街道7，非真实地点",
+    "openingHours": null,
+    "suggestedVisitMinutes": null,
+    "price": null,
+    "verification": "unknown",
+    "sourceUrl": null,
+    "checkedAt": null,
+    "bookingNote": "仅合成测试数据，坐标不代表此名称存在的真实景点，不得正式导入。"
+  },
+  {
+    "id": "618ef365-f841-528c-b961-cfcfaf8af5ff",
+    "name": "测试公园 Theta",
+    "category": "nature",
+    "tags": [
+      "SYNTHETIC_TEST_ONLY",
+      "tag-nature"
+    ],
+    "position": {
+      "lat": 22.19,
+      "lng": 113.54
+    },
+    "address": "测试街道8，非真实地点",
+    "openingHours": null,
+    "suggestedVisitMinutes": null,
+    "price": null,
+    "verification": "unknown",
+    "sourceUrl": null,
+    "checkedAt": null,
+    "bookingNote": "仅合成测试数据，坐标不代表此名称存在的真实景点，不得正式导入。"
+  }
+]
