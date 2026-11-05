@@ -2,7 +2,8 @@ import { defineConfig } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 const cwd = fileURLToPath(new URL('../../../../../', import.meta.url));
 export default defineConfig({
-  testDir: './live-tests', workers: 1,
+  testDir: cwd,
+  testMatch: ['apps/web/src/features/discovery/live-tests/*.spec.ts', 'apps/web/src/router/tests/live-shell.spec.ts'], workers: 1,
   outputDir: '../../../../../test-results/discovery-live',
   use: { baseURL: 'http://127.0.0.1:5181', browserName: 'chromium',
     ...(process.env.TRIPMATE_BROWSER_CHANNEL ? { channel: process.env.TRIPMATE_BROWSER_CHANNEL } : {}) },

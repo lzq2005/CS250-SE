@@ -10,13 +10,13 @@ Hash paths are `#/discover?search=...&category=...` and `#/pois/:poiId?search=..
 
 Details show coordinates, windows/last entry, duration, integer minor-unit price, verification, source, checkedAt and notes. Unknown is distinct from free or known closed. Collections with malformed envelopes/fields are rejected rather than treated as empty or free. Favorites/Add buttons remain disabled until their independent mutation APIs and active Trip state are implemented.
 
-All page styles are Vue-scoped. The component includes its own light-blue background and white content panel without changing global CSS, App.vue, A's backend registration or D's views. No map is implemented.
+All page styles are Vue-scoped. The component includes its own light-blue background and white content panel without changing global CSS, A's backend registration or D's views. No map is implemented.
 
 ## Preview and remaining integration
 
 With the existing web dev server, open `/src/features/discovery/discovery-preview.html`. This standalone development entry mounts the same API-backed component. It has no fixture mode or fake server. A must register B's POI Router and approve/import real POIs before real tourism data can appear. An unregistered list API displays an error; an empty registered database displays an empty list.
 
-B-01 PR #5 is still open. After it merges, B can lazy-import this component into the shell for the two paths above. Do not replace the existing App or pull unmerged B-01 changes into this branch just for previewing. The normal App/build entry is unchanged; the standalone HTML is a Vite development preview, not a production navigation integration.
+B-01 PR #5 is merged; this branch now includes main `6aae40d`. The production Shell lazy-loads the same controlled DiscoveryPage for both paths. Only Shell owns hash parsing/listening; the standalone preview reuses that controller. TripSetup saved/restored state is shared through activeTrip. Normal POI HTTP access still requires A's registration and approved target-database import; the isolated test server is not a production substitute.
 
 The outside-repository preview at port 5174 remains the older, visibly labelled synthetic fixture draft. It was not silently replaced by this production component.
 
@@ -28,7 +28,7 @@ Synthetic POIs live only in `browser-tests/pois.synthetic.json`, are tagged `SYN
 
 ## Verification — final review package, 2026-11-05
 
-Latest integration update: merged current main `5b8a840` (A-04) into this B branch without conflicts. `npm run check` passes **97 tests** (the previous 73 plus A-04's 24), lint, typecheck and build. The 4 controlled-response browser cases pass again. A separate **3 real-data browser cases** now pass through Vite proxy → actual Express Router → isolated migrated SQLite with all five real POIs; there is no HTTP interception in those cases. See `live-tests/README.md` and `playwright.live.config.ts`. The normal demo DB remains empty. This does not complete A's production registration/manual Seed or B's main navigation integration; B-01 remains unmerged. Earlier validation notes below are retained for the initial slice.
+Latest integration update: main `6aae40d` synced without conflicts. Shell navigation, TripSetup/activeTrip and controlled POI routes are connected. Unit/database total is 111 (97 existing + 14 route/state checks). Live browser suite has 6 cases: 3 real POI cases, real Shell/Trip/POI flow, controlled restoration-error case, and actual D component with test-only props. Original controlled Discovery suite has 4 cases. See live-tests/README.md. A's registration/manual Seed and final target-database integration remain pending. Earlier notes below describe the initial slice, not the latest completion status.
 
 - `npm run check`: lint/typecheck/73 unit and database tests/build passed (21 original + 22 POI backend + 9 client + 21 Seed/handoff cases).
 - `npx playwright test -c apps/web/src/features/discovery/playwright.config.ts`: 4 browser cases passed using installed Chrome via `TRIPMATE_BROWSER_CHANNEL=chrome`.

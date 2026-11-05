@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
 import type { Category, POI } from '@tripmate/contracts';
 import { listPois, getPoi } from './poi.api';
+import type { ShellRoute } from '../../router/routes';
+const props = defineProps<{ route: ShellRoute; embedded?: boolean }>();
+const emit = defineEmits<{ navigate: [path: string, replace: boolean] }>();
 
 const gateway = { list: listPois, detail: getPoi };
 const categories: { id: Category | ''; label: string; symbol: string }[] = [
@@ -13,7 +16,7 @@ const keyword = ref('');
 const category = ref<Category | ''>('');
 const items = ref<POI[]>([]);
 const detail = ref<POI | null>(null);
-const mode = ref<'list' | 'detail' | 'missing'>('list');
+const mode = computed(() => props.route.id === 'discover' ? 'list' : props.route.id === 'poi-detail' ? 'detail' : 'missing');
 const loading = ref(false);
 const error = ref('');
 const region = ref<HTMLElement | null>(null);
@@ -36,19 +39,18 @@ async function loadRoute(focus = true) {
   request?.abort();
   request = new AbortController();
   const current = ++sequence;
-  const url = new URL((location.hash.slice(1) || '/discover'), location.origin);
-  keyword.value = url.searchParams.get('search') ?? '';
-  const selected = url.searchParams.get('category') ?? '';
+  const selectedRoute = props.route;
+  const params = new URLSearchParams(selectedRoute.search);
+  keyword.value = params.get('search') ?? '';
+  const selected = params.get('category') ?? '';
   category.value = categories.some(c => c.id === selected) ? selected as Category | '' : '';
-  mode.value = url.pathname === '/discover' ? 'list' : url.pathname.startsWith('/pois/') ? 'detail' : 'missing';
   error.value = ''; detail.value = null; loading.value = true;
-  document.title = `${mode.value === 'list' ? '景点搜索' : '景点详情'} · TripMate`;
   try {
     if (mode.value === 'list') {
       const result = await gateway.list({ search: keyword.value, category: category.value || undefined }, request.signal);
       if (current === sequence) items.value = result.items;
     } else if (mode.value === 'detail') {
-      const result = await gateway.detail(decodeURIComponent(url.pathname.slice('/pois/'.length)), request.signal);
+      const result = await gateway.detail(selectedRoute.poiId ?? '', request.signal);
       if (current === sequence) detail.value = result;
     }
   } catch (cause) {
@@ -62,20 +64,18 @@ async function loadRoute(focus = true) {
 }
 function applyQuery() {
   clearTimeout(searchTimer);
-  // Replace the list state so Back from detail returns to the exact same filters.
-  history.replaceState(null, '', `#/discover${query.value}`);
-  void loadRoute(false);
+  // Shell owns navigation; this feature only requests a location change.
+  emit('navigate', `/discover${query.value}`, true);
 }
 function scheduleSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(applyQuery, 200); }
 function reset() { keyword.value = ''; category.value = ''; applyQuery(); }
-function changedRoute() { void loadRoute(); }
-onMounted(() => { window.addEventListener('hashchange', changedRoute); void loadRoute(false); });
-onUnmounted(() => { request?.abort(); clearTimeout(searchTimer); window.removeEventListener('hashchange', changedRoute); });
+watch(() => props.route, () => { void loadRoute(false); }, { immediate: true });
+onUnmounted(() => { sequence++; request?.abort(); clearTimeout(searchTimer); });
 </script>
 
 <template>
   <div class="discovery-shell">
-  <header class="header"><a href="#/discover" class="brand">✧ TripMate <small>MACAU</small></a><span class="phase">探索澳门</span></header>
+  <header v-if="!embedded" class="header"><a href="#/discover" class="brand">✧ TripMate <small>MACAU</small></a><span class="phase">探索澳门</span></header>
   <section class="content-region" ref="region" tabindex="-1" aria-label="景点探索">
     <section class="panel">
       <template v-if="mode === 'list'">

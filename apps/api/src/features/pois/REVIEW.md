@@ -1,3 +1,7 @@
+## 最新导航接入更新 — 2026-11-05
+
+B-01 PR #5 已合并，本分支无冲突同步 main `6aae40d`。Shell 唯一路由已接 A TripSetup、共享 activeTrip 和 B POI 搜索／详情；D 仅组件注入，实际 D 组件测试通过，D-05 动态详情尚未实现。未修改 A/D 组件、Schema、公共契约或 API 注册。正式 Router/Seed 入口和目标库仍由 A 集成；正常演示库无 POI 写入。PR #10 继续 Draft。
+
 # Member B — B-02 / B-03 统一审核交接
 
 本批解决 B-02/B-03 景点搜索、分类和详情的前后端实现，以及真实数据接入所需的 Seed 准备。REQ-1.3 的 Match% 未实现、未标记完成。基于已合入 A-03 的 main，保留现有 Vue／Express／Prisma 工程与临时 Contract v1.1；不把草案当四人正式批准。

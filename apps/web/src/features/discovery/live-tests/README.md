@@ -18,10 +18,16 @@ npx playwright test -c apps/web/src/features/discovery/playwright.live.config.ts
 
 ## 验证范围
 
-3 个浏览器用例全部通过。没有 page.route、伪造 fetch 或 fixture HTTP 响应；实际链路为浏览器 → 原 Vite 代理 → 原 Express 应用工厂中的 B Router → 实际 SQLite。
+原有 3 个 POI 浏览器用例全部通过，且这些用例没有 page.route、伪造 fetch 或 fixture HTTP 响应；实际链路为浏览器 → 原 Vite 代理 → 原 Express 应用工厂中的 B Router → 实际 SQLite。
 
 覆盖：5 条全量列表、中文关键词／history 分类、固定 UUID 详情、estimated 标记、未知营业与未知费用、官方免费及周窗口、刷新／返回保留筛选、nature 空结果、未知 ID 404，以及390px页面。手机截图见本模块 `previews/real-poi-mobile.png`。
 
 正常演示库在此次测试后只读复查仍为0条 POI，5个UUID没有冲突。这里的临时库导入5条不等于 A 的最终目标库已导入，也不改变数据源元数据的正式导入计数。
 
-仍待完成：A 的正式注册／手动 Seed 接入和目标库确认、B-01 合并后的主导航／activeTrip 接入。`/#/home` 的正式主界面未因此改变，旧5174草稿也未被替换。
+新增 3 个 Shell 集成用例也通过：
+
+1. 正式首页 → A TripSetup 保存 → activeTrip UUID 持久化 → 刷新真实 GET 恢复 → B 搜索／详情／返回，使用同一个隔离库。
+2. 恢复 404 清空与服务失败保留／重试；只有故障场景拦截一次 HTTP 503，不能将整套测试称为全无拦截。
+3. B Shell 挂载 D 的实际 ItineraryDisplay 组件，测试入口显式提供 D 组件测试 props，检查唯一主导航、刷新／返回和 320/390/768px。不是 D-05 真实保存行程后端集成。
+
+目前合计6个用例。B-01 已合并，主导航和 activeTrip 已接线；仍待 A 正式注册／手动 Seed 接入、目标库确认、D 正式数据适配及 D-05 统一动态路由。旧5174草稿没有被替换。

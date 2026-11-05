@@ -15,14 +15,14 @@ test('four tabs and four shortcuts provide honest, recoverable destinations', as
   expect(photoResponse.ok()).toBe(true);
   expect(photoResponse.headers()['content-type']).toContain('image/');
   await page.screenshot({ path: test.info().outputPath('home-desktop.png') });
-  for (const [path, heading] of [['discover', '发现澳门'], ['map', '澳门地图'], ['mine', '我的']] as const) {
+  for (const [path, heading] of [['discover', '发现下一处心动'], ['map', '澳门地图'], ['mine', '我的']] as const) {
     await nav.locator(`a[href="#/${path}"]`).click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
     await expect(nav.locator('[aria-current="page"]')).toHaveAttribute('href', `#/${path}`);
-    await expect(page.getByText('此功能正在开发，暂不能进行实际操作。完成后会在这里开放。')).toBeVisible();
+    if (path !== 'discover') await expect(page.getByText('此功能正在开发，暂不能进行实际操作。完成后会在这里开放。')).toBeVisible();
     if (path === 'discover') await page.screenshot({ path: test.info().outputPath('discover-desktop.png') });
   }
-  for (const [path, heading] of [['trip', '旅行规划'], ['favorites', '地点收藏'], ['trips', '我的澳门行程'], ['plaza', '行程广场']] as const) {
+  for (const [path, heading] of [['trip', '旅行信息设置'], ['favorites', '地点收藏'], ['trips', '我的澳门行程'], ['plaza', '行程广场']] as const) {
     await nav.locator('a[href="#/home"]').click();
     await page.locator(`.shortcut-grid a[href="#/${path}"]`).click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
