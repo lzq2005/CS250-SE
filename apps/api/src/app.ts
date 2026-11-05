@@ -1,6 +1,8 @@
 import express, { type ErrorRequestHandler, type Router } from 'express';
 import type { Failure, Health, Member, Success } from '@tripmate/contracts';
 import { probeDatabase } from './db.js';
+import { prisma } from './db.js';
+import { createTripsRouter } from './features/trips/router.js';
 export type FeatureModule = { owner: Member; router: Router };
 export function createApp(options: { probe?: () => Promise<void>; modules?: FeatureModule[] } = {}) {
   const app = express();
@@ -15,6 +17,7 @@ export function createApp(options: { probe?: () => Promise<void>; modules?: Feat
     }
   });
   // Owners export routers with paths relative to /api/v1; only A registers here.
+  app.use('/api/v1', createTripsRouter(prisma));
   for (const feature of options.modules ?? []) app.use('/api/v1', feature.router);
   app.use((_req, res) => res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Resource not found.', details: null } } satisfies Failure));
   const errors: ErrorRequestHandler = (error: unknown, _req, res, _next) => {
