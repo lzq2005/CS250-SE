@@ -1,6 +1,6 @@
 # B-02 / B-03 — POI read module
 
-Owner: B / Xia Youran. Implements the read API for REQ-1.1 / REQ-1.2 / REQ-1.3 against A-03's existing POI and Favorite tables. Contract v1.1 REVISED and `packages/contracts` remain the temporary implementation baseline; this module does not constitute team approval of the draft.
+Owner: B / Xia Youran. Implements POI discovery read APIs against A-03's existing POI and Favorite tables. This is a B-02/B-03 deliverable, **not completion of REQ-1.3 Match%**; Match% remains B-05. Contract v1.1 REVISED and `packages/contracts` remain the temporary implementation baseline; this module does not constitute team approval of the draft.
 
 ## Behavior
 

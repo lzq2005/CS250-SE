@@ -1,6 +1,8 @@
 # Member B — B-02 / B-03 统一审核交接
 
-本批解决景点搜索、分类和详情的前后端实现，以及真实数据接入所需的 Seed 准备。关联 REQ-1.1 / 1.2 / 1.3。基于已合入 A-03 的 main，保留现有 Vue／Express／Prisma 工程与临时 Contract v1.1；不把草案当四人正式批准。
+本批解决 B-02/B-03 景点搜索、分类和详情的前后端实现，以及真实数据接入所需的 Seed 准备。REQ-1.3 的 Match% 未实现、未标记完成。基于已合入 A-03 的 main，保留现有 Vue／Express／Prisma 工程与临时 Contract v1.1；不把草案当四人正式批准。
+
+最新反馈：用户转达组长已接受第一阶段实现及首批 5 条试点范围／estimated 坐标；B 本地查重无冲突，真实草案 dry-run 拟新增 5、实际写入 0。固定 UUID 清单与目标库接入前检查见 `data/fixtures/pois.integration-status.md`。A 负责 A-04 后的注册和手动 Seed 入口，PR #10 继续 Draft；这不是全栈联调或 Merge 许可。
 
 ## 本批可审核内容
 

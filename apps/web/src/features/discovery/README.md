@@ -1,6 +1,6 @@
 # B-02 / B-03 — Discovery
 
-Owner: B / Xia Youran. Search, categories and POI details for REQ-1.1 / 1.2 / 1.3, using existing shared POI/List types and the temporary Contract v1.1 baseline.
+Owner: B / Xia Youran. B-02/B-03 search, categories and POI details, using existing shared POI/List types and the temporary Contract v1.1 baseline. REQ-1.3 Match% is not implemented or marked complete.
 
 ## Implemented
 
@@ -22,7 +22,7 @@ The outside-repository preview at port 5174 remains the older, visibly labelled 
 
 ## Source review data
 
-The first five real POIs are now structured in `data/fixtures/pois.curated-draft.json`, pending team review. `pois.sources.json` records provenance/stable IDs and `pois.geometry.json` preserves downloaded OSM geometry/version evidence. Coordinates are estimated representative points, not verified entrances; uncertain windows/prices and all visit durations remain null. `readyPOICount` counts team-approved data and is still 0; there are 5 structurally complete review drafts. See `data/fixtures/pois.review.md`. No real data has been imported. The idempotent Seed helper is now implemented/tested; A's common entry integration and data approval remain pending.
+The five real POIs in `data/fixtures/pois.curated-draft.json` have leader acceptance for pilot scope and estimated coordinates, as relayed by the user. B's local database audit found no ID/name collisions; the existing UUIDs are fixed for the pilot. The leader's target database still needs its own dry-run. `pois.sources.json` records this distinction and `pois.geometry.json` preserves the OSM evidence. Unknown windows/prices/durations remain null; coordinates are not exact entrances. Final target-database integration and imported counts remain 0. See `data/fixtures/pois.integration-status.md`. The Seed helper is implemented/tested, but A's common entry and app registration remain pending.
 
 Synthetic POIs live only in `browser-tests/pois.synthetic.json`, are tagged `SYNTHETIC_TEST_ONLY`, and are imported only by tests. They must never be imported by the production page, API service or Seed. Tests intercept HTTP responses explicitly; this is not a deployed mock API.
 

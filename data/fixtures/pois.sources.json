@@ -16,8 +16,8 @@
       },
       "suggestedVisitMinutes": null,
       "pending": [
-        "团队审核坐标代表位置与参观范围；不是入口精确导航",
-        "等待 B 最终批准固定 UUID 并核对实际库；组件测试 ID 不作为真实数据 ID"
+        "A目标数据库正式导入前dry-run及同名/ID复查",
+        "A注册Router和手动Seed入口；保持estimated坐标及未知值，不承诺精确入口"
       ],
       "seedReady": false,
       "candidateId": "273024e3-ae0c-5172-a486-e460efb96639",
@@ -36,7 +36,7 @@
         "status": "estimated",
         "snapshotFile": "pois.geometry.json"
       },
-      "reviewStatus": "structured-draft-pending-team-review",
+      "reviewStatus": "leader-pilot-accepted-local-id-check-passed-target-preflight-pending",
       "structuredFixtureFile": "pois.curated-draft.json"
     },
     {
@@ -52,8 +52,8 @@
       },
       "suggestedVisitMinutes": null,
       "pending": [
-        "团队审核坐标代表位置与参观范围；不是入口精确导航",
-        "等待 B 最终批准固定 UUID 并核对实际库；组件测试 ID 不作为真实数据 ID"
+        "A目标数据库正式导入前dry-run及同名/ID复查",
+        "A注册Router和手动Seed入口；保持estimated坐标及未知值，不承诺精确入口"
       ],
       "seedReady": false,
       "candidateId": "11930ad8-8106-5262-8350-aff2f9b0e65f",
@@ -69,7 +69,7 @@
         "status": "estimated",
         "snapshotFile": "pois.geometry.json"
       },
-      "reviewStatus": "structured-draft-pending-team-review",
+      "reviewStatus": "leader-pilot-accepted-local-id-check-passed-target-preflight-pending",
       "structuredFixtureFile": "pois.curated-draft.json"
     },
     {
@@ -88,8 +88,8 @@
       },
       "suggestedVisitMinutes": null,
       "pending": [
-        "团队审核坐标代表位置与参观范围；不是入口精确导航",
-        "等待 B 最终批准固定 UUID 并核对实际库；组件测试 ID 不作为真实数据 ID"
+        "A目标数据库正式导入前dry-run及同名/ID复查",
+        "A注册Router和手动Seed入口；保持estimated坐标及未知值，不承诺精确入口"
       ],
       "seedReady": false,
       "candidateId": "8913d2bd-feaf-509d-8c02-560ef2e41510",
@@ -105,7 +105,7 @@
         "status": "estimated",
         "snapshotFile": "pois.geometry.json"
       },
-      "reviewStatus": "structured-draft-pending-team-review",
+      "reviewStatus": "leader-pilot-accepted-local-id-check-passed-target-preflight-pending",
       "structuredFixtureFile": "pois.curated-draft.json"
     },
     {
@@ -125,8 +125,8 @@
       },
       "suggestedVisitMinutes": null,
       "pending": [
-        "团队审核坐标代表位置与参观范围；不是入口精确导航",
-        "等待 B 最终批准固定 UUID 并核对实际库；组件测试 ID 不作为真实数据 ID"
+        "A目标数据库正式导入前dry-run及同名/ID复查",
+        "A注册Router和手动Seed入口；保持estimated坐标及未知值，不承诺精确入口"
       ],
       "seedReady": false,
       "candidateId": "24775c63-c4f7-51de-81d8-5b4b83481aba",
@@ -142,7 +142,7 @@
         "status": "estimated",
         "snapshotFile": "pois.geometry.json"
       },
-      "reviewStatus": "structured-draft-pending-team-review",
+      "reviewStatus": "leader-pilot-accepted-local-id-check-passed-target-preflight-pending",
       "structuredFixtureFile": "pois.curated-draft.json"
     },
     {
@@ -163,9 +163,9 @@
       },
       "suggestedVisitMinutes": null,
       "pending": [
-        "团队审核坐标代表位置与参观范围；不是入口精确导航",
-        "等待 B 最终批准固定 UUID 并核对实际库；组件测试 ID 不作为真实数据 ID",
-        "妈阁庙营业起始时间差异未解决；费用未知已合法保留 null"
+        "A目标数据库正式导入前dry-run及同名/ID复查",
+        "A注册Router和手动Seed入口；保持estimated坐标及未知值，不承诺精确入口",
+        "营业起始差异与费用未知继续保留null；不以此伪造完整信息"
       ],
       "seedReady": false,
       "candidateId": "dc3578b4-eed7-56f4-9f2b-6c627d6cfb93",
@@ -181,7 +181,7 @@
         "status": "estimated",
         "snapshotFile": "pois.geometry.json"
       },
-      "reviewStatus": "structured-draft-pending-team-review",
+      "reviewStatus": "leader-pilot-accepted-local-id-check-passed-target-preflight-pending",
       "structuredFixtureFile": "pois.curated-draft.json"
     }
   ],
@@ -197,16 +197,45 @@
     "网页来源可能为缓存；checkedAt 是资料检查时间，不是现场验证时间",
     "首次5条均为history，不代表30候选或四类别全部完成"
   ],
-  "readyPOICountMeaning": "团队已批准可进入 Seed 接入的数量；与结构完整待审数量不同",
+  "readyPOICountMeaning": "最终目标库接入及显式导入就绪数，当前0；组长已接受首批5条的试点范围及估计坐标，不等同于未经审核。",
   "canonicalIdReview": {
     "existingProductionFixtureFound": false,
     "sameNameTestFixture": "apps/web/src/features/itinerary/d01-fixture.ts",
     "sameNameTestId": "11111111-1111-4111-8111-111111111111",
-    "action": "保持 B 的候选 UUID，不复用或修改 D 的组件测试 ID；待 B 最终批准真实数据 UUID 后统一集成引用。",
-    "status": "test-id-boundary-confirmed-production-ids-pending-b-finalization",
+    "action": "本地 A-03 POI 表查重及 dry-run 通过；B 保留现有5个UUID作为试点固定ID，不使用D测试ID。A目标库正式写入前再次dry-run，发现冲突须人工处理，不重新分配UUID。",
+    "status": "b-pilot-ids-fixed-local-audit-passed-target-preflight-required",
     "clarificationReceivedOn": "2026-11-05",
     "clarificationSource": "用户转达组员 D；未声称已独立读取群聊",
     "dClarification": "大三巴 fixture 的 1111... 仅用于组件测试，真实集成使用 B 最终批准的固定 UUID。",
-    "currentStPaulsCandidateId": "8913d2bd-feaf-509d-8c02-560ef2e41510"
-  }
+    "currentStPaulsCandidateId": "8913d2bd-feaf-509d-8c02-560ef2e41510",
+    "localDatabaseAudit": {
+      "checkedAt": "2026-11-05T08:46:17.227534Z",
+      "existingPoiCount": 0,
+      "duplicateNameOrIdCount": 0,
+      "draftSha256": "8954fd58b582b2ca4b7548a7851c86f446d0312997064eed5e47ea34c450487d",
+      "scope": "configured local SQLite only; not the leader or other members databases",
+      "dryRun": {
+        "created": 5,
+        "updated": 0,
+        "unchanged": 0
+      },
+      "beforeCount": 0,
+      "afterCount": 0,
+      "applied": false
+    }
+  },
+  "leaderReview": {
+    "source": "用户转达组长回复，未声称独立读取群聊",
+    "receivedOn": "2026-11-05",
+    "pilotScopeAcceptedCount": 5,
+    "completeDataset": false,
+    "estimatedRepresentativePointsAccepted": true,
+    "exactEntranceOrWalkingEndpoint": false,
+    "apiRegistrationOwner": "A after A-04 merge",
+    "seedEntryOwner": "A, explicit manual dry-run then intentional apply",
+    "matchPercentageComplete": false,
+    "keepPrDraft": true,
+    "targetDatabasePreflightRequired": true
+  },
+  "dataReviewStatus": "pilot-scope-and-estimated-coordinates-accepted-awaiting-target-database-integration"
 }
