@@ -28,9 +28,11 @@ Synthetic POIs live only in `browser-tests/pois.synthetic.json`, are tagged `SYN
 
 ## Verification — final review package, 2026-11-05
 
+Latest integration update: merged current main `5b8a840` (A-04) into this B branch without conflicts. `npm run check` passes **97 tests** (the previous 73 plus A-04's 24), lint, typecheck and build. The 4 controlled-response browser cases pass again. A separate **3 real-data browser cases** now pass through Vite proxy → actual Express Router → isolated migrated SQLite with all five real POIs; there is no HTTP interception in those cases. See `live-tests/README.md` and `playwright.live.config.ts`. The normal demo DB remains empty. This does not complete A's production registration/manual Seed or B's main navigation integration; B-01 remains unmerged. Earlier validation notes below are retained for the initial slice.
+
 - `npm run check`: lint/typecheck/73 unit and database tests/build passed (21 original + 22 POI backend + 9 client + 21 Seed/handoff cases).
 - `npx playwright test -c apps/web/src/features/discovery/playwright.config.ts`: 4 browser cases passed using installed Chrome via `TRIPMATE_BROWSER_CHANNEL=chrome`.
 - Browser coverage: contracted requests, search/category, details, Back/refresh preserving query, unknown/closed/free, missing detail, unregistered API without fallback and recovery, rapid categories and 320/390/768 px layouts. Mobile screenshot inspected in `test-results/discovery/`.
 - Initial new tests needed JSON import attributes for Node's ESM loader; corrected before the successful runs. No new dependencies installed.
 
-Backend tests use the real A-03 SQLite migrations in a temporary database; browser tests use controlled synthetic HTTP responses. This is not yet evidence of real-data full-stack integration. New browser tests are separate from shared CI; A/D still coordinate CI registration. The unit tests are automatically discovered by the existing `npm test` command.
+The original 4 browser tests use controlled responses; the new separate live configuration proves the real-data full-stack path in an isolated database. Neither is completion of normal main-app/target-database integration. New browser configurations remain separate from shared CI; A/D coordinate CI registration. Unit tests are automatically discovered by existing `npm test`.

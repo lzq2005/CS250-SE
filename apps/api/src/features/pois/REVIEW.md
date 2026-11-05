@@ -4,6 +4,8 @@
 
 最新反馈：用户转达组长已接受第一阶段实现及首批 5 条试点范围／estimated 坐标；B 本地查重无冲突，真实草案 dry-run 拟新增 5、实际写入 0。固定 UUID 清单与目标库接入前检查见 `data/fixtures/pois.integration-status.md`。A 负责 A-04 后的注册和手动 Seed 入口，PR #10 继续 Draft；这不是全栈联调或 Merge 许可。
 
+最新接续：A-04 已合入 main，B 分支无冲突合入 `5b8a840`，没有人工修改 A 文件。97 个单元／数据库测试、lint/typecheck/build 通过，原4个浏览器用例通过；新增3个真实数据隔离浏览器测试通过（无HTTP mock，浏览器→代理→实际Router→临时SQLite）。测试启动器复用原应用工厂，仅测试注入 B Router，不是正式API入口。正常演示库仍0条，主导航／activeTrip等待B-01，A正式注册／手动Seed仍待接入。详见前端 `live-tests/README.md`。
+
 ## 本批可审核内容
 
 | 部分 | 已实现 | 实际验证 |
