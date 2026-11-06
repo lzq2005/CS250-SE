@@ -63,7 +63,10 @@ export function generatePlan(input: PlannerInput): PlanResult {
   // day could not be evaluated because required information was unknown.
   const recordFailure = (item: Unscheduled) => {
     const previous = failures.get(item.poiId);
-    if (!previous || item.code.startsWith('UNKNOWN_') || !previous.code.startsWith('UNKNOWN_')) {
+    // A later closed day must not mask an earlier actionable time constraint
+    // on an open day. An unknown day still prevents claiming known infeasibility.
+    if (!previous || item.code.startsWith('UNKNOWN_') ||
+        (!previous.code.startsWith('UNKNOWN_') && (item.code !== 'CLOSED' || previous.code === 'CLOSED'))) {
       failures.set(item.poiId, item);
     }
   };
