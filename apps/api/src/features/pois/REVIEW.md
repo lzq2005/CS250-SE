@@ -1,3 +1,9 @@
+## 最新Review准备 — 2026-11-06
+
+PR #10无冲突同步main d93c24f（含A-05/D-02）。lint/typecheck/build、131个单元／数据库测试（maxWorkers=2）、32个浏览器用例通过（Shell/共享21、live7、Discovery受控4）。A-05 HTTP、D-02原套件和实际B Shell挂载D地图的兼容性均有证据。生产地图数据适配、正式POI注册／Seed及Targets真实链路不在这些测试的完成声明内。
+
+PR #11后端与Targets前端0fdc6a6均未混入。组长已确认先审合#10，再同步审合#11，由A独立接入三组Router和手动Seed，最后Targets前端另开Draft PR；当前#10仍Draft，不自动Merge，试点不自动导入。
+
 ## 最新导航接入更新 — 2026-11-05
 
 B-01 PR #5 已合并，本分支无冲突同步 main `6aae40d`。Shell 唯一路由已接 A TripSetup、共享 activeTrip 和 B POI 搜索／详情；D 仅组件注入，实际 D 组件测试通过，D-05 动态详情尚未实现。未修改 A/D 组件、Schema、公共契约或 API 注册。正式 Router/Seed 入口和目标库仍由 A 集成；正常演示库无 POI 写入。PR #10 继续 Draft。
