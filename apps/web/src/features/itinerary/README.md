@@ -51,3 +51,21 @@ mock. No real C API is called. `setVisitTime` requires 15-minute times and
 Order changes have no shared `EditCommand` and are intentionally absent. Stop
 removal and overwrite confirmation remain D-04, while persistence/versioning
 remain D-05.
+
+## D-04 destructive confirmations
+
+`DestructiveActionDialog.vue` requires an explicit confirm or cancel action.
+Cancelling emits no mutation. `ItineraryEditor.vue` can optionally expose stop
+removal through its existing `CandidateEditorAdapter`; the remove command keeps
+the POI in `unscheduled`.
+
+`ItineraryOverwriteAction.vue` demonstrates the SavedItinerary overwrite
+confirmation boundary and sends the shared overwrite request shape only through
+an injected adapter. A real save/version implementation remains D-05.
+
+```text
+/src/features/itinerary/confirmation-preview.html
+```
+
+The preview uses explicit test adapters. Single-stop replacement has no shared
+`EditCommand` and is therefore not added.

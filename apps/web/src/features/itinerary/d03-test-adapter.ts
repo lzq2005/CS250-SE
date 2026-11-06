@@ -44,6 +44,22 @@ export function createD03TestAdapter(options: MockOptions = {}): D03TestAdapter 
         if (leg) leg.mode = command.mode;
       }
 
+      if (command.type === 'removeStop') {
+        if (command.confirmed !== true) throw new Error('Stop removal must be confirmed');
+        const day = updated.result.days.find((item) =>
+          item.stops.some((stop) => stop.id === command.stopId),
+        );
+        const stop = day?.stops.find((item) => item.id === command.stopId);
+        if (!day || !stop) throw new Error('Edit refers to a missing stop');
+        day.stops = day.stops.filter((item) => item.id !== stop.id);
+        day.legs = day.legs.filter((leg) => leg.toPoiId !== stop.poiId);
+        updated.result.unscheduled.push({
+          poiId: stop.poiId,
+          reason: 'USER_REMOVED',
+          code: 'UNSCHEDULED',
+        });
+      }
+
       updated.commands.push(clone(command));
       return updated;
     },
