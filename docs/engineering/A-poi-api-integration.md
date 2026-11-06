@@ -110,13 +110,34 @@ There were no code/test assertion failures in that run. This branch has not
 been pushed, no A PR has been opened, and remote CI has not run for this change.
 PR #10 was rechecked after local verification and remains Draft/open/unmerged.
 
-### Candidate database dry-runs (not final-target confirmation)
+### Confirmed formal target — file missing
 
-No `.env` or inherited `DATABASE_URL` selects a final target. An explicit target
-path was requested from the user and is still pending. To avoid assuming that
-B's earlier local check proves A's target, the CLI was run with explicit
-`--dry-run` against each migrated local candidate. Paths below are relative to
-the shared workspace `E:\MUST\2609\CS250 软件工程`:
+After the initial handoff, the user selected this exact formal development/demo
+database path:
+
+`E:\MUST\2609\CS250 软件工程\CS250-SE\apps\api\prisma\dev.db`
+
+Read-only filesystem verification on 2026-11-06 found that **both the file and
+its parent `apps/api/prisma` directory do not exist** in that original checkout.
+Therefore database structure, actual applied Prisma migration status, POI count,
+UUID/name conflicts and formal-target dry-run are **unavailable / not run**;
+the POI count must not be reported as zero. The checked-in migration files in
+`origin/main` do not prove any migration has been applied to this missing file.
+
+No database or directory was created, replaced or migrated; no formal-target
+Prisma connection, `db:setup` or seed command was executed. Historical A03/A04/A05
+databases are explicitly excluded as formal targets. Development/tests continue
+to use isolated temporary SQLite, fixed B POI UUIDs remain unchanged, and formal
+apply requires the user's later explicit approval. The next database action
+awaits user direction concerning the missing file, rather than automatic setup.
+
+### Earlier candidate dry-runs — historical evidence only
+
+Before the formal target was selected, no `.env` or inherited `DATABASE_URL`
+identified it. The CLI was run with explicit `--dry-run` against three migrated
+local candidates. These are **not the formal target and cannot substitute for
+its verification**. Paths below are relative to the shared workspace
+`E:\MUST\2609\CS250 软件工程`:
 
 | SQLite candidate | Count before/after | Fixed UUID/name collisions | Proposed created/updated/unchanged |
 | --- | --- | --- | --- |
@@ -138,6 +159,6 @@ not migrated or seeded. The integration worktree has no normal `dev.db`.
 The fixture SHA-256 remains
 `8954fd58b582b2ca4b7548a7851c86f446d0312997064eed5e47ea34c450487d`.
 Full local CLI outputs are under ignored `test-results/CS250-SE-A0*-dry-run.txt`.
-These results cover only these exact candidate files, not any unprovided
-database. **Final-target check remains pending until its absolute path is
-confirmed. No formal seed write was executed.**
+These results cover only these exact historical candidate files, not the
+confirmed missing formal target. **Formal-target verification is blocked by
+the missing file. No formal seed write was executed.**
