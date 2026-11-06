@@ -38,6 +38,7 @@ const stopRows = computed(() => {
 
 let leafletMap: LeafletMap | undefined;
 let routeLayer: LayerGroup | undefined;
+let resizeFrame: number | undefined;
 
 function configureMap(): void {
   if (!mapElement.value || leafletMap) return;
@@ -45,7 +46,9 @@ function configureMap(): void {
   leafletMap = L.map(mapElement.value, {
     zoomControl: true,
     attributionControl: true,
-  }).setView([22.1987, 113.5439], 12);
+    zoomAnimation: false,
+    fadeAnimation: false,
+  }).setView([22.1987, 113.5439], 12, { animate: false });
 
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -138,11 +141,12 @@ function renderMap(day: ItineraryDay | undefined): void {
     leafletMap.fitBounds(L.latLngBounds(coordinates), {
       padding: [44, 44],
       maxZoom: 15,
+      animate: false,
     });
   } else if (coordinates[0]) {
-    leafletMap.setView(coordinates[0], 15);
+    leafletMap.setView(coordinates[0], 15, { animate: false });
   } else {
-    leafletMap.setView([22.1987, 113.5439], 12);
+    leafletMap.setView([22.1987, 113.5439], 12, { animate: false });
   }
 }
 
@@ -178,10 +182,17 @@ onMounted(async () => {
   await nextTick();
   configureMap();
   renderMap(activeDay.value);
-  requestAnimationFrame(() => leafletMap?.invalidateSize());
+  resizeFrame = requestAnimationFrame(() => {
+    resizeFrame = undefined;
+    if (leafletMap && mapElement.value?.isConnected) leafletMap.invalidateSize();
+  });
 });
 
 onBeforeUnmount(() => {
+  if (resizeFrame !== undefined) {
+    cancelAnimationFrame(resizeFrame);
+    resizeFrame = undefined;
+  }
   leafletMap?.remove();
   leafletMap = undefined;
   routeLayer = undefined;

@@ -15,6 +15,12 @@ HTML. Coordinates must be finite values within latitude -90..90 and longitude
 -180..180. Missing POIs or invalid coordinates are kept in the ordered list and
 reported without creating a fake marker.
 
+Leaflet zoom/fade animation is disabled because this view does not depend on
+animated transitions. Programmatic `setView`/`fitBounds` calls are explicitly
+non-animated, and the component cancels its pending resize frame before removing
+the map. This prevents Leaflet zoom callbacks from running after Vue unmounts
+the component.
+
 Run the Web development server and open:
 
 ```text

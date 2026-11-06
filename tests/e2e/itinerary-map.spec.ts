@@ -1,5 +1,12 @@
 import { expect, test } from '@playwright/test';
 
+type HarnessWindow = Window & {
+  __mapShellHarness?: {
+    mount: () => void;
+    unmount: () => void;
+  };
+};
+
 const firstDayPath = '/src/features/map/map-preview.html';
 const boundaryPath = '/src/features/map/map-preview.html?scenario=missing-poi';
 const invalidCoordinatePath = '/src/features/map/map-preview.html?scenario=invalid-coordinate';
@@ -118,5 +125,40 @@ test.describe('D-02 itinerary map fixture preview', () => {
     await expect(tooltip).toContainText('<img src=x onerror="window.__mapXss=1">危险景点');
     await expect(tooltip.locator('img')).toHaveCount(0);
     await expect(page.locator('body')).not.toHaveAttribute('data-injected', 'yes');
+  });
+
+  test('unmounts safely during rapid shell navigation and day switching', async ({ page }) => {
+    const pageErrors: string[] = [];
+    page.on('pageerror', (error) => pageErrors.push(error.message));
+
+    await page.goto('/#/map');
+    await page.addScriptTag({
+      url: '/src/features/map/map-shell-test-harness.ts',
+      type: 'module',
+    });
+    await page.waitForFunction(() =>
+      Boolean((window as HarnessWindow).__mapShellHarness),
+    );
+
+    for (let round = 0; round < 4; round += 1) {
+      await page.evaluate(() => (window as HarnessWindow).__mapShellHarness?.mount());
+      await expect(page.getByTestId('map-stop-marker')).toHaveCount(2);
+      await page.evaluate(() => {
+        window.location.hash = '#/home';
+      });
+      await page.waitForTimeout(650);
+      await page.evaluate(() => {
+        window.location.hash = '#/map';
+      });
+    }
+
+    await page.evaluate(() => (window as HarnessWindow).__mapShellHarness?.mount());
+    await page.getByRole('button', { name: '第 2 天 2026-11-04' }).click();
+    await page.evaluate(() => {
+      window.location.hash = '#/home';
+    });
+    await page.waitForTimeout(650);
+
+    expect(pageErrors).toEqual([]);
   });
 });
