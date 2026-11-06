@@ -31,3 +31,23 @@ The defensive boundary fixture is available at:
 ```text
 /src/features/itinerary/itinerary-preview.html?scenario=leg-boundary
 ```
+
+## D-03 candidate editor
+
+`ItineraryEditor.vue` provides candidate-level time and transport editing. It
+requires an injected `CandidateEditorAdapter`; successful edits replace the
+current `CandidatePlan` with the adapter response. The component never calculates
+feasibility, downstream propagation, or warnings locally.
+
+```text
+/src/features/itinerary/editor-preview.html
+```
+
+The standalone preview uses `d03-test-adapter.ts`, explicitly marked as a test
+mock. No real C API is called. `setVisitTime` requires 15-minute times and
+`start < end`; `setTransportMode` uses the active `date` and destination
+`toPoiId`.
+
+Order changes have no shared `EditCommand` and are intentionally absent. Stop
+removal and overwrite confirmation remain D-04, while persistence/versioning
+remain D-05.
