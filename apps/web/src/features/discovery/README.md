@@ -8,7 +8,7 @@ Owner: B / Xia Youran. B-02/B-03 search, categories and POI details, using exist
 
 Hash paths are `#/discover?search=...&category=...` and `#/pois/:poiId?search=...&category=...`. Returning from detail, browser Back and refresh retain filters. Debounced search and cancellation/sequence checks prevent older requests overwriting newer results.
 
-Details show coordinates, windows/last entry, duration, integer minor-unit price, verification, source, checkedAt and notes. Unknown is distinct from free or known closed. Collections with malformed envelopes/fields are rejected rather than treated as empty or free. Favorites/Add buttons remain disabled until their independent mutation APIs and active Trip state are implemented.
+Details show coordinates, windows/last entry, duration, integer minor-unit price, verification, source, checkedAt and notes. Unknown is distinct from free or known closed. Collections with malformed envelopes/fields are rejected rather than treated as empty or free. On the independent B-04 frontend branch, TargetActions adds contracted add/remove operations using shared activeTrip; unregistered APIs produce an explicit error, not fake success. Favorites remain disabled. See TARGETS_INTEGRATION.md for branch dependencies, verification and pending production integration.
 
 All page styles are Vue-scoped. The component includes its own light-blue background and white content panel without changing global CSS, A's backend registration or D's views. No map is implemented.
 
