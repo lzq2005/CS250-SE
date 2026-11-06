@@ -4,6 +4,7 @@ const entry = '/src/features/discovery/discovery-preview.html';
 
 test.beforeEach(async ({ page }) => {
   // Browser HTTP responses are controlled test fixtures, not a production mock API.
+  await page.route('**/api/v1/favorites/*', route => route.fulfill({ status: 404, json: { error: { code: 'NOT_FOUND', message: 'Test module not registered', details: null } } }));
   await page.route('**/api/v1/pois**', async route => {
     const url = new URL(route.request().url());
     if (url.pathname === '/api/v1/pois') {
@@ -44,7 +45,7 @@ test('shows empty, unknown, known closed/free and missing detail distinctly', as
   await page.getByRole('link', { name: '测试景点 Beta', exact: true }).click();
   await expect(page.getByText('免费', { exact: true })).toBeVisible();
   await expect(page.getByText('已知整周关闭', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: '♡ 收藏（尚未接入）' })).toBeDisabled();
+  await expect(page.getByLabel('地点收藏操作').getByRole('button', { name: '收藏此地点', exact: false })).toBeDisabled();
   await page.goto(`${entry}#/pois/10000000-0000-4000-8000-000000000099`);
   await expect(page.getByRole('heading', { name: '地点资料未找到' })).toBeVisible();
 });

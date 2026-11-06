@@ -1,5 +1,7 @@
 # B-02 / B-03 — Discovery
 
+Current independent frontend branch (2026-11-06): FavoriteAction and the Shell favorites outlet are implemented locally. See [FAVORITES_INTEGRATION.md](FAVORITES_INTEGRATION.md) for dependencies and exact verification. This branch does not include the separately saved Targets frontend or PR #11 backend. Earlier implementation notes below describe the POI baseline; the former disabled Favorite button has been replaced here. No production fixture fallback or formal database import is introduced.
+
 Owner: B / Xia Youran. B-02/B-03 search, categories and POI details, using existing shared POI/List types and the temporary Contract v1.1 baseline. REQ-1.3 Match% is not implemented or marked complete.
 
 ## Implemented
