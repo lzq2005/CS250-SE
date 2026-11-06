@@ -10,12 +10,14 @@ import type {
   TravelMode,
 } from '@tripmate/contracts';
 import type { CandidateEditorAdapter } from './editorAdapter';
+import DestructiveActionDialog from './DestructiveActionDialog.vue';
 
 const candidate = defineModel<CandidatePlan>('candidate', { required: true });
 const props = defineProps<{
   pois: POI[];
   adapter: CandidateEditorAdapter;
   dataSourceLabel?: string;
+  allowRemoveStop?: boolean;
 }>();
 
 type TimeDraft = { start: string; end: string };
@@ -25,6 +27,7 @@ const activeDate = ref('');
 const busyStopId = ref<string | null>(null);
 const successMessage = ref('');
 const errorMessage = ref('');
+const pendingRemoval = ref<PlannedStop | null>(null);
 const timeDrafts = reactive<Record<string, TimeDraft>>({});
 const modeDrafts = reactive<Record<string, ModeDraft>>({});
 
@@ -94,8 +97,8 @@ async function applyCommand(
   stop: PlannedStop,
   command: EditCommand,
   successText: string,
-): Promise<void> {
-  if (isBusy.value) return;
+): Promise<boolean> {
+  if (isBusy.value) return false;
   busyStopId.value = stop.id;
   successMessage.value = '';
   errorMessage.value = '';
@@ -107,9 +110,11 @@ async function applyCommand(
     });
     candidate.value = updated;
     successMessage.value = successText;
+    return true;
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : '修改失败，请重试。';
     initializeDrafts(activeDay.value);
+    return false;
   } finally {
     busyStopId.value = null;
   }
@@ -130,6 +135,30 @@ async function applyVisitTime(stop: PlannedStop): Promise<void> {
     { type: 'setVisitTime', stopId: stop.id, start: draft.start, end: draft.end },
     '时间修改已应用',
   );
+}
+
+function requestStopRemoval(stop: PlannedStop): void {
+  if (!props.allowRemoveStop || isBusy.value) return;
+  errorMessage.value = '';
+  successMessage.value = '';
+  pendingRemoval.value = stop;
+}
+
+function cancelStopRemoval(): void {
+  if (isBusy.value) return;
+  pendingRemoval.value = null;
+  errorMessage.value = '';
+}
+
+async function confirmStopRemoval(): Promise<void> {
+  const stop = pendingRemoval.value;
+  if (!stop || isBusy.value) return;
+  const removed = await applyCommand(
+    stop,
+    { type: 'removeStop', stopId: stop.id, confirmed: true },
+    '景点已从当前日程移除',
+  );
+  if (removed) pendingRemoval.value = null;
 }
 
 async function applyTransportMode(stop: PlannedStop): Promise<void> {
@@ -206,7 +235,7 @@ watch(activeDay, initializeDrafts, { immediate: true, deep: true });
     <p v-if="successMessage" class="feedback feedback--success" role="status">
       {{ successMessage }}
     </p>
-    <p v-if="errorMessage" class="feedback feedback--error" role="alert">
+    <p v-if="errorMessage && pendingRemoval === null" class="feedback feedback--error" role="alert">
       {{ errorMessage }}
     </p>
 
@@ -292,6 +321,17 @@ watch(activeDay, initializeDrafts, { immediate: true, deep: true });
             </button>
           </form>
         </div>
+
+        <button
+          v-if="allowRemoveStop"
+          type="button"
+          class="remove-action"
+          :disabled="isBusy"
+          :aria-label="`从当前日程移除 ${poiById.get(stop.poiId)?.name ?? '地点'}`"
+          @click="requestStopRemoval(stop)"
+        >
+          从当前日程移除
+        </button>
       </li>
     </ol>
 
@@ -304,10 +344,35 @@ watch(activeDay, initializeDrafts, { immediate: true, deep: true });
           <span>{{ warning.message }}</span>
         </li>
       </ul>
+      <div v-if="candidate.result.unscheduled.length" class="unscheduled-summary">
+        <h3>未安排景点</h3>
+        <ul>
+          <li
+            v-for="item in candidate.result.unscheduled"
+            :key="`${item.poiId}-${item.code}`"
+            data-testid="unscheduled-candidate"
+          >
+            <strong>{{ poiById.get(item.poiId)?.name ?? '地点资料不可用' }}</strong>
+            <span>{{ item.code }} · {{ item.reason }}</span>
+          </li>
+        </ul>
+      </div>
       <p class="scope-note">
-        顺序调整当前没有共享编辑命令；删除与覆盖确认属于 D-04，本阶段不提供。
+        顺序调整当前没有共享编辑命令；覆盖已保存行程需通过独立确认流程。
       </p>
     </section>
+
+    <DestructiveActionDialog
+      :open="pendingRemoval !== null"
+      title="从当前日程移除景点？"
+      :description="`将“${pendingRemoval ? poiById.get(pendingRemoval.poiId)?.name ?? '该地点' : '该地点'}”从当前日程移除。它会保留为未安排，不会删除行程目标或收藏。`"
+      confirm-label="确认移除"
+      cancel-label="取消移除"
+      :busy="isBusy"
+      :error-message="errorMessage"
+      @cancel="cancelStopRemoval"
+      @confirm="confirmStopRemoval"
+    />
   </section>
 </template>
 
@@ -603,6 +668,13 @@ button:disabled {
   color: var(--ink);
 }
 
+.remove-action {
+  margin-top: 12px;
+  border: 1px solid #e1bbb5;
+  background: #fff7f5;
+  color: #8f2d20;
+}
+
 .result-notes {
   margin-top: 18px;
   border: 1px solid var(--line);
@@ -642,6 +714,21 @@ button:disabled {
 .scope-note {
   color: var(--muted);
   font-size: 12px;
+}
+
+.unscheduled-summary {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 13px;
+}
+
+.unscheduled-summary h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.unscheduled-summary strong {
+  color: var(--ink);
 }
 
 .scope-note {
