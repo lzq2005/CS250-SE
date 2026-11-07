@@ -13,6 +13,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   overwritten: [saved: SavedItinerary];
+  error: [error: Error];
 }>();
 
 const dialogOpen = ref(false);
@@ -48,7 +49,9 @@ async function confirmOverwrite(): Promise<void> {
     successMessage.value = '保存行程已覆盖';
     emit('overwritten', saved);
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : '覆盖失败，请重试。';
+    const normalized = error instanceof Error ? error : new Error('覆盖失败，请重试。');
+    errorMessage.value = normalized.message;
+    emit('error', normalized);
   } finally {
     busy.value = false;
   }
