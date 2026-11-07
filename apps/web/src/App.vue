@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { computed, defineAsyncComponent, inject, nextTick, onMounted, ref, watch } from 'vue';
 import { getHealth } from './api';
 import AppIcon from './shared/ui/AppIcon.vue';
-import { navigation, resolveRoute, shortcuts } from './router/routes';
-const route = ref(resolveRoute(window.location.hash));
+import { navigation, shortcuts } from './router/routes';
+import { useShellRouter } from './router/shell-router';
+import { shellFeatureViewsKey } from './router/feature-views';
+import { activeTrip } from './shared/active-trip';
+const { route, navigate: navigateTo } = useShellRouter();
+const TripSetup = defineAsyncComponent(() => import('./features/trip/TripSetup.vue'));
+const DiscoveryPage = defineAsyncComponent(() => import('./features/discovery/DiscoveryPage.vue'));
+const views = inject(shellFeatureViewsKey, {});
+const externalView = computed(() => route.value.id === 'map' || route.value.id === 'trips' ? views[route.value.id] : undefined);
+const currentTrip = activeTrip.state;
+const initialRestore = ref(true);
 const main = ref<HTMLElement | null>(null);
 const message = ref('正在连接服务…');
 const busy = ref(false);
@@ -19,18 +28,19 @@ async function checkHealth() {
   finally { busy.value = false; }
 }
 async function navigate() {
-  route.value = resolveRoute(window.location.hash);
   document.title = `${route.value.title} · TripMate Macau`;
   await nextTick();
   main.value?.focus({ preventScroll: true });
   window.scrollTo({ top: 0 });
 }
+watch(route, (value, previous) => {
+  document.title = `${value.title} · TripMate Macau`;
+  if (previous && (value.id !== previous.id || value.search !== previous.search || value.poiId !== previous.poiId)) void navigate();
+}, { immediate: true });
 onMounted(() => {
-  window.addEventListener('hashchange', navigate);
-  document.title = `${route.value.title} · TripMate Macau`;
   void checkHealth();
+  void activeTrip.restore().finally(() => { initialRestore.value = false; });
 });
-onUnmounted(() => window.removeEventListener('hashchange', navigate));
 </script>
 <template>
   <a class="skip-link" href="#main-content" @click.prevent="main?.focus()">跳到主要内容</a>
@@ -40,6 +50,11 @@ onUnmounted(() => window.removeEventListener('hashchange', navigate));
       <span class="header-note"><span class="small-dot"></span> 澳门，自在探索</span>
     </header>
     <main id="main-content" ref="main" tabindex="-1" class="page-content">
+      <aside v-if="currentTrip.status !== 'empty'" class="active-trip" aria-label="当前旅行" aria-live="polite">
+        <template v-if="currentTrip.status === 'ready'">当前旅行：<strong>{{ currentTrip.trip?.title }}</strong><a href="#/trip">查看／编辑</a></template>
+        <template v-else-if="currentTrip.status === 'restoring'">正在恢复当前旅行…</template>
+        <template v-else>当前旅行暂时无法验证。<button @click="activeTrip.restore()">重新验证旅行</button></template>
+      </aside>
       <div v-if="route.id === 'home'" class="home-scene">
         <section class="hero" aria-labelledby="home-title">
           <div class="hero-copy">
@@ -60,9 +75,16 @@ onUnmounted(() => window.removeEventListener('hashchange', navigate));
           </div>
         </section>
       </div>
-      <section v-else class="destination" aria-labelledby="destination-title">
+      <section v-else class="destination" :aria-label="route.title">
         <a class="back-link" href="#/home">← 返回首页</a>
-        <div class="destination-card">
+        <template v-if="route.id === 'trip'">
+          <p v-if="initialRestore || currentTrip.status === 'restoring'" class="destination-card">正在恢复旅行信息…</p>
+          <div v-else-if="currentTrip.status === 'unavailable'" class="destination-card"><h1>旅行信息设置</h1><p>当前旅行暂时无法恢复，请重试，或开始新的旅行。</p><button @click="activeTrip.clear()">开始新的旅行</button></div>
+          <TripSetup v-else :initial-trip="currentTrip.trip ?? undefined" @saved="activeTrip.saved" />
+        </template>
+        <DiscoveryPage v-else-if="route.id === 'discover' || route.id === 'poi-detail'" :route="route" embedded @navigate="navigateTo" />
+        <component :is="externalView" v-else-if="externalView" />
+        <div v-else class="destination-card">
         <p class="eyebrow">{{ route.english }}</p>
         <h1 id="destination-title">{{ route.title }}</h1>
         <p class="destination-description">{{ route.description }}</p>

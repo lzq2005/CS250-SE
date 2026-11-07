@@ -98,3 +98,5 @@ h2 { font-size: 22px; font-weight: 600; margin: 0; }.section-note { color: var(-
   .home-scene .shortcut-text strong { font-size: 15px; }.home-scene .shortcut-text > span { font-size: 11px; }
   .home-scene .card-arrow { right: 11px; top: 29px; width: 14px; }
 }
+.active-trip{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:12px 16px;margin-bottom:18px;border:1px solid #d5e5f6;border-radius:14px;background:#fff;color:#244f82;font-size:13px;overflow-wrap:anywhere}
+.active-trip a,.active-trip button{color:#246ec0;text-decoration:underline;min-height:44px;display:inline-flex;align-items:center}
