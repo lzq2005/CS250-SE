@@ -10,11 +10,19 @@ import { createApp } from '../../apps/api/src/app.js';
 import { createFavoritesRouter } from '../../apps/api/src/features/favorites/router.js';
 import { createTargetsRouter } from '../../apps/api/src/features/targets/router.js';
 import { readTargets } from '../../apps/api/src/features/targets/service.js';
+import { createPoisRouter } from '../../apps/api/src/features/pois/poi.router.js';
+import { createPoiService } from '../../apps/api/src/features/pois/poi.service.js';
 
 const directory = mkdtempSync(join(tmpdir(), 'tripmate-b04-'));
 const url = `file:${join(directory, 'relations.db').replaceAll('\\', '/')}`;
 const db = new PrismaClient({ datasourceUrl: url });
-const app = createApp({ modules: [{ owner: 'B', router: createFavoritesRouter(db) }, { owner: 'B', router: createTargetsRouter(db) }] });
+// Test-only composition of the actual factories; A owns production registration.
+const combinedApp = (client: PrismaClient) => createApp({ modules: [
+  { owner: 'B', router: createPoisRouter(client) },
+  { owner: 'B', router: createFavoritesRouter(client) },
+  { owner: 'B', router: createTargetsRouter(client) },
+] });
+const app = combinedApp(db);
 const id = (n: number) => `b0000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const trip = id(1), otherTrip = id(2), a = id(11), b = id(12), c = id(13), missing = id(99);
 const fav = (poiId: string) => `/api/v1/favorites/${poiId}`;
@@ -41,6 +49,59 @@ afterAll(async () => {
 });
 
 describe('B-04 Favorites and Targets against migrated SQLite', () => {
+  it('reflects Favorite writes in POI AND filters without coupling Trip targets or changing POI details', async () => {
+    await db.pOI.update({ where: { id: c }, data: { category: 'shopping' } });
+    const detail = await request(app).get(`/api/v1/pois/${a}`);
+    expect(detail.status).toBe(200);
+    expect(detail.body.data).toMatchObject({ id: a, openingHours: null, price: null, suggestedVisitMinutes: null });
+    expect((await request(app).get('/api/v1/pois').query({ favoriteOnly: true })).body).toEqual({ data: { items: [], total: 0 } });
+    for (const poiId of [a, c]) expect((await request(app).put(fav(poiId)).send({})).status).toBe(200);
+    expect((await request(app).post(targets()).send({ poiId: b })).status).toBe(201);
+    const filtered = await request(app).get('/api/v1/pois').query({ favoriteOnly: true, category: 'history', search: ' POI 0 ' });
+    expect(filtered.status).toBe(200);
+    expect(filtered.body).toEqual({ data: { items: [detail.body.data], total: 1 } });
+    expect((await request(app).get('/api/v1/pois').query({ favoriteOnly: true, category: 'shopping', search: 'POI 0' })).body)
+      .toEqual({ data: { items: [], total: 0 } });
+    expect((await request(app).get('/api/v1/pois').query({ favoriteOnly: true, category: 'shopping' })).body.data.items.map((poi: { id: string }) => poi.id)).toEqual([c]);
+    expect((await request(app).delete(fav(a))).status).toBe(200);
+    expect((await request(app).get('/api/v1/pois').query({ favoriteOnly: true })).body.data.items.map((poi: { id: string }) => poi.id)).toEqual([c]);
+    expect((await request(app).get(targets())).body.data.poiIds).toEqual([b]);
+    expect((await request(app).get(`/api/v1/pois/${a}`)).body).toEqual(detail.body);
+    expect((await request(app).get('/api/v1/pois').query({ favoriteOnly: false })).body.data.total).toBe(3);
+  });
+  it('reconstructs Favorite and per-Trip target state through a fresh client using the same isolated database', async () => {
+    expect((await request(app).put(fav(a)).send({})).status).toBe(200);
+    for (const poiId of [b, a]) expect((await request(app).post(targets()).send({ poiId })).status).toBe(201);
+    expect((await request(app).post(targets(otherTrip)).send({ poiId: c })).status).toBe(201);
+    const reopened = new PrismaClient({ datasourceUrl: url });
+    try {
+      const restored = combinedApp(reopened);
+      expect((await request(restored).get(fav(a))).body).toEqual({ data: { poiId: a, favorited: true } });
+      expect((await request(restored).get('/api/v1/pois').query({ favoriteOnly: true })).body.data.items.map((poi: { id: string }) => poi.id)).toEqual([a]);
+      expect((await request(restored).get(targets())).body).toEqual({ data: { tripId: trip, poiIds: [b, a] } });
+      expect((await request(restored).get(targets(otherTrip))).body).toEqual({ data: { tripId: otherTrip, poiIds: [c] } });
+      const duplicate = await request(restored).post(targets()).send({ poiId: a });
+      expect(duplicate.status).toBe(409);
+      expect(duplicate.body.error).toMatchObject({ code: 'DUPLICATE_TARGET', details: { tripId: trip, poiId: a } });
+      expect((await request(restored).delete(`${targets()}/${b}`)).body.data.poiIds).toEqual([a]);
+      expect((await request(app).get(targets())).body.data.poiIds).toEqual([a]);
+      expect((await request(app).get(targets(otherTrip))).body.data.poiIds).toEqual([c]);
+      expect((await request(app).get(fav(a))).body.data.favorited).toBe(true);
+    } finally { await reopened.$disconnect(); }
+  });
+  it('resolves POIs in target order within a caller-owned read transaction, independently of Favorites', async () => {
+    for (const poiId of [c, a]) expect((await request(app).post(targets()).send({ poiId })).status).toBe(201);
+    expect((await request(app).put(fav(b)).send({})).status).toBe(200);
+    const selected = await db.$transaction(async tx => {
+      const view = await readTargets(tx, trip);
+      const pois = createPoiService(tx);
+      return { view, resolved: await Promise.all(view.poiIds.map(poiId => pois.get(poiId))) };
+    });
+    expect(selected.view).toEqual({ tripId: trip, poiIds: [c, a] });
+    expect(selected.resolved.map(poi => poi?.id)).toEqual([c, a]);
+    expect(selected.resolved.every(poi => poi?.verification === 'unknown' && poi.price === null && poi.openingHours === null)).toBe(true);
+    expect(await db.favorite.count()).toBe(1);
+  });
   it('persists Favorite state with idempotent PUT/DELETE and exact shared response fields', async () => {
     expect((await request(app).get(fav(a))).body).toEqual({ data: { poiId: a, favorited: false } });
     for (let n = 0; n < 2; n++) {

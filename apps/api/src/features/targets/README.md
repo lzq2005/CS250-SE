@@ -1,6 +1,6 @@
 # B-04 — Trip Targets backend
 
-按组长最新顺序准备的导航／activeTrip／Targets 集成方案见 [INTEGRATION_PLAN.md](./INTEGRATION_PLAN.md)。方案不等于已接入；B-01、PR #10 及 A 的手动 Seed／注册按依赖顺序处理。
+导航／activeTrip／Targets 集成方案见 [INTEGRATION_PLAN.md](./INTEGRATION_PLAN.md)。2026-11-07 已同步包含 B-01、A-05、D-02 及 PR #10 的 main；PR #11 继续 Draft，A 的正式注册／手动 Seed 及前端全链路验收仍待进行。
 
 Owner B / Xia Youran. Uses the existing Trip/POI/TripTarget tables and shared `TargetsView`, preserving API Contract v1.1 REVISED semantics. No Schema/migration or contract changes.
 
@@ -26,13 +26,13 @@ DELETE verifies Trip and directly deleteMany on the relation, deliberately not l
 
 ## Integration handoff
 
-A registers exported `createTargetsRouter(prisma)` through the existing app mechanism; this module does not edit app.ts/server.ts. `createTargetService(prisma)` exposes get/add/remove. `readTargets(tx,tripId)` can be called inside C's existing read transaction, returning ordered shared TargetsView and 404 if Trip is absent. POI resolution is separate: C must resolve ALL returned IDs through the B read module after PR #10 integration and report missing POIs as DATA_INTEGRITY_ERROR; do not silently filter them. No new public HTTP endpoint for C.
+A registers exported `createTargetsRouter(prisma)` through the existing app mechanism; this module does not edit app.ts/server.ts. `createTargetService(prisma)` exposes get/add/remove. `readTargets(tx,tripId)` can be called inside C's existing read transaction, returning ordered shared TargetsView and 404 if Trip is absent. POI resolution is separate: C must resolve ALL returned IDs through the now-merged B read module and report missing POIs as DATA_INTEGRITY_ERROR; do not silently filter them. No new public HTTP endpoint for C.
 
 POST requires a valid Trip path but does not invent server-side activeTrip storage. B's future shared frontend state must supply the active Trip; no active Trip means the Add button is disabled. Favorite remains independent of that state.
 
-## Actual verification — 2026-11-05
+## Actual verification — 2026-11-07
 
-`npm run check`: lint/typecheck/build and **75 tests** pass. Of these,30 new HTTP/SQLite cases cover:
+Merged `origin/main=dbf7d45abfd07baf755b641716ac4a081bacccd9` without conflicts. `npm run lint`, `npm run typecheck`, `npm test -- --maxWorkers=2` and `npm run build` pass: **164 tests** total (main 131 + B-04 33). These commands were run separately; default `npm run check` was not rerun. The original 30 HTTP/SQLite cases cover:
 
 - Favorite persistence and idempotence, missing POIs, exact shared envelopes.
 - First-Add order, duplicate conflict details, removal/re-Add/reset, per-Trip isolation.
@@ -41,6 +41,8 @@ POST requires a valid Trip path but does not invent server-side activeTrip stora
 - ReadTargets in an existing transaction; invalid queries/UUID/body/JSON and no writes.
 - Concurrent duplicate and different Adds/PUTs, controlled position-conflict retry and bounded busy failure, sanitized unavailable database errors.
 
+The additional three integration cases compose actual POI/Favorites/Targets factories only in the test app, verifying POI Favorite AND filters and unchanged details; reopening through a fresh Prisma client/router against the same temporary DB; and ordered POI resolution through a caller-owned read transaction without selecting Favorites as targets. No production handler needed changes.
+
 Tests use a fresh migrated temporary SQLite. Only the disposable test DB temporarily disables foreign keys to construct the legacy-corruption fixture, then immediately restores them; no production code disables FKs. No real tourism data or demo database is changed.
 
-No new browser tests: this is a backend-only slice. Root CI discovers the new tests through existing npm test. B-04 frontend, main registration and joint POI-read integration remain pending, and this is not a claim the full feature is complete. PR #10 remains independently reviewable; this branch does not import it.
+The existing Shell configuration passed **21 browser regressions**, including A-04/A-05 and D-01/D-02, on Chrome and the existing isolated server. No new browser tests/configuration or frontend implementation were added here; these checks do not prove the full Trip→POI→Targets browser flow or production registration. Root CI discovers the backend tests through existing npm test. PR #11 stays Draft pending review; A registers the routers and manual Seed separately. The target database and fixed UUIDs must be checked by A via dry-run and data approval before any explicit import. All five pilot POIs remain unimported in the normal demo DB.

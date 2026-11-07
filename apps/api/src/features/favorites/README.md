@@ -14,7 +14,7 @@ Paths below are relative to `/api/v1`, responses use the existing `{data:T}` env
 
 All three require a known POI (unknown POI 404); repeat-delete idempotence means no Favorite relation for an existing POI. The contract's special missing-POI cleanup exception applies to Targets DELETE, implemented separately. Malformed UUID/URL/query returns 400; unsupported body returns 422 with details.fields. Malformed JSON uses A's existing 400 handler.
 
-Favorite operations use transactions and never modify TripTarget, Trip, Companion, SavedItinerary or POI data. No active Trip is needed to favorite a POI. The service upserts on the existing unique poiId and deletes only that Favorite relation. The Favorites page will later use the existing `GET /pois?favoriteOnly=true` from PR #10; no extra list URL is invented here.
+Favorite operations use transactions and never modify TripTarget, Trip, Companion, SavedItinerary or POI data. No active Trip is needed to favorite a POI. The service upserts on the existing unique poiId and deletes only that Favorite relation. The Favorites page uses the existing `GET /pois?favoriteOnly=true` from the now-merged PR #10; no extra list URL is invented here. Production registration remains A's separate task.
 
 ## A registration handoff
 
@@ -24,6 +24,10 @@ Export: `createFavoritesRouter(prisma)` from `router.ts`. A can add `{owner:'B',
 
 ## Validation and scope
 
-`npm run check` passed: lint, typecheck, **75 tests** (45 current-main + 30 B-04), build. `tests/unit/favorites-targets.test.ts` uses actual migrations in an isolated temporary SQLite and synthetic POIs, never the real pilot data/demo database.
+On 2026-11-07 this branch merged `origin/main=dbf7d45abfd07baf755b641716ac4a081bacccd9` without conflicts, including PR #10, A-05 and D-02. Actual rerun commands passed: `npm run lint`, `npm run typecheck`, `npm test -- --maxWorkers=2` (**164 tests**, main's 131 + 33 B-04), and `npm run build`. This is not a claim that the default unbounded `npm run check` was rerun. Initial attempts hit a sandbox cache permission failure and a Prisma startup timeout before business tests; the subsequent full isolated run passed without changing timeouts or business code.
 
-This branch `feat/b/B-04-favorites-targets` starts from main `5b8a840` and does not depend on unmerged PR #10 code. POI read integration will be tested together after PR #10 merges; no POI module was copied. Frontend Favorites UI, activeTrip state, Add button wiring and browser validation are not implemented by this backend slice. Shared CI commands/configuration, dependencies and Schema remain unchanged. Do not mark the whole B-04/user requirement complete.
+The 33 cases in `tests/unit/favorites-targets.test.ts` use actual migrations in an isolated temporary SQLite and synthetic POIs, never the normal pilot/demo database. Three new combined-factory checks verify Favorite writes through POI AND filters, persisted state through a fresh client/router instance, and ordered target-to-POI reads in a caller-owned transaction. The real factories are composed only in tests, not registered in production app.ts.
+
+The existing B Shell browser configuration also passed **21 tests**, including A-04/A-05 and D-01/D-02, using its isolated test server and Chrome (`TRIPMATE_BROWSER_CHANNEL=chrome`, `node node_modules/@playwright/test/cli.js test --config apps/web/src/router/playwright.config.ts`). This does not demonstrate real Favorites/Targets frontend integration; the server does not register these two routers.
+
+`feat/b/B-04-favorites-targets` remains the backend-only Draft PR #11. Independent local Favorites/Targets frontend branches are not included. No POI implementation was copied or changed relative to the merged main. Shared types, CI commands/configuration, dependencies, Schema, migrations and A/D implementation remain unchanged. A's registration/manual Seed/target-database dry-run and the full user-flow verification are still pending. Do not mark the whole B-04/user requirement complete.

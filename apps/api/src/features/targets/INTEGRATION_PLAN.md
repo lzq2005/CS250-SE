@@ -2,6 +2,12 @@
 
 2026-11-05，依据用户转达的组长最新安排。本文是实施准备，不表示接口已注册、数据已导入或需求已完成；不变更公共契约、成员分工或技术栈。
 
+## 接续状态 — 2026-11-07
+
+B-01 PR #5、A-04／A-05、D-02 和 POI PR #10 已合入 main。PR #10 经 D 对 b19b8c5 正式 Approve，由组长合并；本分支已无冲突同步 `origin/main=dbf7d45`。PR #11 继续 Draft，先进行独立审核；A 仍负责正式注册、手动 Seed CLI 和目标库 dry-run，首批 5 条暂不正式导入。
+
+Shell／Trip Setup／activeTrip 已随 PR #10 合入，不新增第二套状态或 Router。Favorites 与 Targets 前端已分别保存在 B 的独立本地分支，尚未混入本后端 PR。依赖正式合入后再各自同步 main，按约定单独准备 Draft PR 和完整真实页面联调。以下导航／交互规则继续适用；原依赖列表保留为历史实施顺序，不表示前置 PR 仍未合并。
+
 ## 依赖顺序
 
 1. D 正式 Review B-01 PR #5，组长合并。
@@ -17,8 +23,8 @@ B-01 合入后，Trip Setup/activeTrip 可利用已经合入的 A-04 接口先�
 
 | 位置 | 工作 | 边界 |
 | --- | --- | --- |
-| apps/web/src/router/**、App.vue | 将现有 hash 导航接到 TripSetup / DiscoveryPage | B-01 合入后才改；不换 Vue Router 或重搭工程 |
-| apps/web/src/shared/active-trip.ts（拟） | 单一共享状态及恢复逻辑 | B 内部状态，无公共 DTO 或后端 activeTrip 新接口 |
+| apps/web/src/router/**、App.vue | 已接到 TripSetup / DiscoveryPage；后续沿用 | 不换 Vue Router 或重搭工程 |
+| apps/web/src/shared/active-trip.ts（已有） | 沿用单一共享状态及恢复逻辑 | B 内部状态，无公共 DTO 或后端 activeTrip 新接口 |
 | apps/web/src/features/discovery/** | 收藏／Targets 客户端、按钮状态及目标读取 | 复用现有搜索、详情，不扩展 POI 响应字段 |
 | B 所属测试／配置 | 导航、状态恢复、关系独立、异常和移动端验收 | 不自行修改共享 workflow，由 A 协调 CI |
 
@@ -65,4 +71,4 @@ apps/api/src/app.ts、server.ts、Schema/migration、Seed 总入口由 A 维护�
 5. 搜索／分类／详情返回和刷新保留查询；空态／错误／未知值与手机布局保持正确。
 6. 最终目标库的dry-run、显式导入、正常应用注册及新增CI用例有各自证据；不能用隔离测试代替这些完成条件。
 
-当前已有：PR #10 的 POI/Seed 及隔离真实数据链路、PR #11 的30个后端关系用例。尚未执行本计划的正式导航／activeTrip／前端Targets接入。REQ-1.3 Match% 仍不标完成。
+当前已有：main 的 POI/Seed、Shell/activeTrip；PR #11 的33个后端关系／POI组合用例，合计164个单元／数据库测试通过，现有Shell配置21个浏览器回归通过。独立前端本地成果不等于正式页面联调；正式Router、目标库验证／批准写入及完整Trip→POI→Targets验收仍未完成。REQ-1.3 Match% 仍不标完成。
