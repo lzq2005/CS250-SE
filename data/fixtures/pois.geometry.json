@@ -1,0 +1,881 @@
+{
+  "purpose": "用于复核代表坐标的原始OSM几何快照；不包含贡献者user/uid/changeset个人标识",
+  "attribution": "© OpenStreetMap contributors",
+  "license": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "snapshots": [
+    {
+      "version": "0.6",
+      "copyright": "OpenStreetMap and contributors",
+      "attribution": "http://www.openstreetmap.org/copyright",
+      "license": "http://opendatacommons.org/licenses/odbl/1-0/",
+      "sourceUrl": "https://api.openstreetmap.org/api/0.6/way/404235920/full.json",
+      "retrievedAt": "2026-11-04T14:19:27.695202Z",
+      "rawSha256": "946e0eb31a3a1d18dae5dd8a3a8bd9cf7cc43eafcddac299dd81c85794e5e6fe",
+      "elements": [
+        {
+          "type": "node",
+          "id": 4065067041,
+          "lat": 22.1889527,
+          "lon": 113.5347939,
+          "timestamp": "2022-03-09T11:49:43Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 4065067042,
+          "lat": 22.1886941,
+          "lon": 113.5348963,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 5
+        },
+        {
+          "type": "node",
+          "id": 4065067044,
+          "lat": 22.1883624,
+          "lon": 113.5345306,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 5
+        },
+        {
+          "type": "node",
+          "id": 4065067045,
+          "lat": 22.1882535,
+          "lon": 113.5342424,
+          "timestamp": "2022-03-09T11:49:43Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 4065067046,
+          "lat": 22.1882038,
+          "lon": 113.5340661,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 4065067047,
+          "lat": 22.1881988,
+          "lon": 113.5339662,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 4065067048,
+          "lat": 22.1884174,
+          "lon": 113.5339019,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 6164129404,
+          "lat": 22.1889062,
+          "lon": 113.5346892,
+          "timestamp": "2022-03-09T11:49:43Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 6164129405,
+          "lat": 22.1889195,
+          "lon": 113.5347147,
+          "timestamp": "2022-03-09T11:49:43Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 6164129408,
+          "lat": 22.1889408,
+          "lon": 113.5347425,
+          "timestamp": "2022-03-09T11:49:43Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 6173046253,
+          "lat": 22.1885754,
+          "lon": 113.5346464,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 6173046254,
+          "lat": 22.1885992,
+          "lon": 113.5346942,
+          "timestamp": "2022-03-09T11:49:43Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 6173046256,
+          "lat": 22.1885399,
+          "lon": 113.5345702,
+          "timestamp": "2022-03-09T11:49:43Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 6173046258,
+          "lat": 22.1884647,
+          "lon": 113.5344767,
+          "timestamp": "2022-03-09T11:49:43Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 6273865283,
+          "lat": 22.1886842,
+          "lon": 113.5348722,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 7541690457,
+          "lat": 22.1886425,
+          "lon": 113.5342355,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 7541690458,
+          "lat": 22.1888483,
+          "lon": 113.5345836,
+          "timestamp": "2022-03-09T11:49:43Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 7913611475,
+          "lat": 22.1886665,
+          "lon": 113.5348342,
+          "timestamp": "2022-03-09T11:49:43Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 7913611476,
+          "lat": 22.1886876,
+          "lon": 113.5348795,
+          "timestamp": "2022-03-09T11:49:43Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 7913611478,
+          "lat": 22.1887305,
+          "lon": 113.5348819,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 7913611492,
+          "lat": 22.1884872,
+          "lon": 113.5344653,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 7913611496,
+          "lat": 22.1884599,
+          "lon": 113.5339693,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 7913611500,
+          "lat": 22.1887397,
+          "lon": 113.5343907,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 7913611507,
+          "lat": 22.188703,
+          "lon": 113.5343271,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 9177510290,
+          "lat": 22.1883123,
+          "lon": 113.5343974,
+          "timestamp": "2022-03-09T11:49:43Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 12495508943,
+          "lat": 22.1886848,
+          "lon": 113.5342994,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 1,
+          "tags": {
+            "barrier": "gate"
+          }
+        },
+        {
+          "type": "way",
+          "id": 404235920,
+          "timestamp": "2025-01-12T09:27:21Z",
+          "version": 9,
+          "nodes": [
+            4065067041,
+            7913611478,
+            4065067042,
+            7913611476,
+            6273865283,
+            7913611475,
+            6173046254,
+            6173046253,
+            6173046256,
+            7913611492,
+            6173046258,
+            4065067044,
+            9177510290,
+            4065067045,
+            4065067046,
+            4065067047,
+            4065067048,
+            7913611496,
+            7541690457,
+            12495508943,
+            7913611507,
+            7913611500,
+            7541690458,
+            6164129404,
+            6164129405,
+            6164129408,
+            4065067041
+          ],
+          "tags": {
+            "addr:housenumber": "10",
+            "addr:street": "龍頭左巷 Travessa de António da Silva",
+            "name": "鄭家大屋 Casa do Mandarim",
+            "name:en": "Mandarin's House",
+            "name:pt": "Casa do Mandarim",
+            "name:zh": "鄭家大屋",
+            "start_date": "1869",
+            "tourism": "museum",
+            "wikidata": "Q6757684",
+            "wikimedia_commons": "Category:Mandarin's House",
+            "wikipedia": "en:Mandarin's House"
+          }
+        }
+      ]
+    },
+    {
+      "version": "0.6",
+      "copyright": "OpenStreetMap and contributors",
+      "attribution": "http://www.openstreetmap.org/copyright",
+      "license": "http://opendatacommons.org/licenses/odbl/1-0/",
+      "sourceUrl": "https://api.openstreetmap.org/api/0.6/way/192573681/full.json",
+      "retrievedAt": "2026-11-04T14:19:16.558042Z",
+      "rawSha256": "b38074b84f803a5ff58224877d572de38b1dc94f80391ce93a2f2071b7b398f4",
+      "elements": [
+        {
+          "type": "node",
+          "id": 2031208639,
+          "lat": 22.1941605,
+          "lon": 113.5411387,
+          "timestamp": "2021-08-13T17:09:41Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 2031208641,
+          "lat": 22.194193,
+          "lon": 113.5413564,
+          "timestamp": "2021-08-13T17:09:41Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 2031208647,
+          "lat": 22.194311,
+          "lon": 113.5413316,
+          "timestamp": "2021-08-13T17:09:41Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 2031208649,
+          "lat": 22.1943035,
+          "lon": 113.5412779,
+          "timestamp": "2021-08-13T17:09:41Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 2031208651,
+          "lat": 22.1942735,
+          "lon": 113.5411172,
+          "timestamp": "2021-08-13T17:09:41Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 2031208653,
+          "lat": 22.1942971,
+          "lon": 113.5412425,
+          "timestamp": "2021-08-13T17:09:41Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 7695596321,
+          "lat": 22.1942058,
+          "lon": 113.5411289,
+          "timestamp": "2021-08-13T17:09:41Z",
+          "version": 2,
+          "tags": {
+            "addr:housenumber": "7",
+            "addr:street": "大堂巷 Travessa da Sé"
+          }
+        },
+        {
+          "type": "node",
+          "id": 7695596323,
+          "lat": 22.1941875,
+          "lon": 113.5413216,
+          "timestamp": "2021-08-13T17:09:41Z",
+          "version": 2
+        },
+        {
+          "type": "way",
+          "id": 192573681,
+          "timestamp": "2023-11-12T12:05:58Z",
+          "version": 8,
+          "nodes": [
+            2031208651,
+            7695596321,
+            2031208639,
+            7695596323,
+            2031208641,
+            2031208647,
+            2031208649,
+            2031208653,
+            2031208651
+          ],
+          "tags": {
+            "addr:housenumber": "7",
+            "addr:street": "大堂巷 Travessa da Sé",
+            "alt_name": "Kam Yuk Tong",
+            "building": "yes",
+            "building:levels": "2",
+            "description": "World Heritage-listed mansion built around 1889.",
+            "height": "14.5",
+            "historic": "heritage",
+            "name": "盧家大屋 Casa de Lou Kau",
+            "name:en": "Lou Kau Mansion",
+            "name:pt": "Casa de Lou Kau",
+            "name:zh": "盧家大屋",
+            "wikidata": "Q15926456",
+            "wikimedia_commons": "Category:Lou Kau Mansion",
+            "wikipedia": "en:Lou Kau Mansion"
+          }
+        }
+      ]
+    },
+    {
+      "version": "0.6",
+      "copyright": "OpenStreetMap and contributors",
+      "attribution": "http://www.openstreetmap.org/copyright",
+      "license": "http://opendatacommons.org/licenses/odbl/1-0/",
+      "sourceUrl": "https://api.openstreetmap.org/api/0.6/way/192183185/full.json",
+      "retrievedAt": "2026-11-04T14:19:29.358145Z",
+      "rawSha256": "06139f11c3e363d67cb1b6042508fa80155f436a8e84c631cdb9d58eb934bc82",
+      "elements": [
+        {
+          "type": "node",
+          "id": 2027483949,
+          "lat": 22.1974467,
+          "lon": 113.5407574,
+          "timestamp": "2024-03-09T04:53:55Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 2027483950,
+          "lat": 22.1974497,
+          "lon": 113.5409633,
+          "timestamp": "2024-03-09T04:53:55Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 2027483951,
+          "lat": 22.1974642,
+          "lon": 113.5407571,
+          "timestamp": "2024-03-09T04:53:55Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 2027483952,
+          "lat": 22.1974672,
+          "lon": 113.540963,
+          "timestamp": "2024-03-09T04:53:55Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 7621468858,
+          "lat": 22.1974481,
+          "lon": 113.540857,
+          "timestamp": "2024-03-09T04:53:55Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 8979643741,
+          "lat": 22.1974657,
+          "lon": 113.5408567,
+          "timestamp": "2024-03-09T04:53:55Z",
+          "version": 2
+        },
+        {
+          "type": "way",
+          "id": 192183185,
+          "timestamp": "2024-04-25T03:40:49Z",
+          "version": 14,
+          "nodes": [
+            2027483949,
+            7621468858,
+            2027483950,
+            2027483952,
+            8979643741,
+            2027483951,
+            2027483949
+          ],
+          "tags": {
+            "addr:city": "Macau",
+            "addr:country": "MO",
+            "alt_name_1": "大三巴",
+            "alt_name_2": "牌坊",
+            "building": "yes",
+            "height": "26.2",
+            "historic": "ruins",
+            "historic:civilization": "portuguese",
+            "is_in:country": "China",
+            "is_in:country_code": "CN",
+            "is_in:iso_3166_2": "CN-92",
+            "is_in:province": "Macau Special Administrative Region",
+            "is_in:province_code": "CN-MO",
+            "name": "大三巴牌坊 Ruínas de São Paulo",
+            "name:en": "Ruins of St. Paul",
+            "name:es": "Ruinas de la catedral de San Pablo de Macao",
+            "name:fr": "Ruines de Saint-Paul",
+            "name:ja": "聖ポール天主堂跡",
+            "name:ko": "성 바울 성당 유적",
+            "name:pt": "Ruínas de São Paulo",
+            "name:ru": "Руины Святого Павла",
+            "name:th": "ซากโบสถ์นักบุญเปาโล",
+            "name:vi": "Di tích Nhà thờ Thánh Phaolô, Ma Cao",
+            "name:zh": "大三巴牌坊",
+            "official_name": "聖保祿大教堂遺址",
+            "source": "Bing",
+            "tourism": "attraction",
+            "wikidata": "Q1551411",
+            "wikimedia_commons": "Category:Cathedral of Saint Paul in Macau",
+            "wikipedia": "zh:大三巴牌坊"
+          }
+        }
+      ]
+    },
+    {
+      "version": "0.6",
+      "copyright": "OpenStreetMap and contributors",
+      "attribution": "http://www.openstreetmap.org/copyright",
+      "license": "http://opendatacommons.org/licenses/odbl/1-0/",
+      "sourceUrl": "https://api.openstreetmap.org/api/0.6/way/404669396/full.json",
+      "retrievedAt": "2026-11-04T14:19:30.717813Z",
+      "rawSha256": "5fa4f8b5984e23b61860910a99108f34f11dcc7fc70b6ad85065b65438df1de1",
+      "elements": [
+        {
+          "type": "node",
+          "id": 4069436647,
+          "lat": 22.1968399,
+          "lon": 113.5495127,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 4069436648,
+          "lat": 22.1967883,
+          "lon": 113.549589,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 4069436649,
+          "lat": 22.1968062,
+          "lon": 113.5496249,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 4069436650,
+          "lat": 22.1968568,
+          "lon": 113.5498949,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 4069436651,
+          "lat": 22.1967417,
+          "lon": 113.550023,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 4069436653,
+          "lat": 22.196526,
+          "lon": 113.5498843,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 4069436654,
+          "lat": 22.1963712,
+          "lon": 113.5496981,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 4069436655,
+          "lat": 22.1964731,
+          "lon": 113.5493782,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 4069436656,
+          "lat": 22.1964785,
+          "lon": 113.5495119,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 7055158397,
+          "lat": 22.1964588,
+          "lon": 113.5494568,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 7055158398,
+          "lat": 22.19649,
+          "lon": 113.5494329,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 7055158407,
+          "lat": 22.1965536,
+          "lon": 113.5498634,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 7055158409,
+          "lat": 22.1963674,
+          "lon": 113.5497094,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 9621171308,
+          "lat": 22.1967676,
+          "lon": 113.5496482,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 1
+        },
+        {
+          "type": "node",
+          "id": 9621171309,
+          "lat": 22.1968086,
+          "lon": 113.549983,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 1
+        },
+        {
+          "type": "node",
+          "id": 9621171310,
+          "lat": 22.1962623,
+          "lon": 113.5495231,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 1
+        },
+        {
+          "type": "node",
+          "id": 9621171311,
+          "lat": 22.196248,
+          "lon": 113.5495039,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 1
+        },
+        {
+          "type": "node",
+          "id": 9621171312,
+          "lat": 22.196199,
+          "lon": 113.5495367,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 1
+        },
+        {
+          "type": "node",
+          "id": 9621171313,
+          "lat": 22.1962942,
+          "lon": 113.5495012,
+          "timestamp": "2022-03-29T15:01:26Z",
+          "version": 1
+        },
+        {
+          "type": "way",
+          "id": 404669396,
+          "timestamp": "2025-04-14T02:45:53Z",
+          "version": 10,
+          "nodes": [
+            4069436647,
+            4069436648,
+            4069436649,
+            9621171308,
+            4069436650,
+            9621171309,
+            4069436651,
+            7055158407,
+            4069436653,
+            7055158409,
+            4069436654,
+            9621171312,
+            9621171311,
+            9621171310,
+            9621171313,
+            4069436655,
+            7055158398,
+            7055158397,
+            4069436656,
+            4069436647
+          ],
+          "tags": {
+            "access": "yes",
+            "historic": "fort",
+            "name": "東望洋炮台 Fortaleza da Guia",
+            "name:en": "Guia Fortress",
+            "name:ko": "기아 요새",
+            "name:pt": "Fortaleza da Guia",
+            "name:zh": "東望洋炮台",
+            "name:zh-Hans": "东望洋炮台",
+            "name:zh-Hant": "東望洋炮台",
+            "wikidata": "Q3078465",
+            "wikimedia_commons": "Category:Guia Fortress",
+            "wikipedia": "zh:東望洋炮台"
+          }
+        }
+      ]
+    },
+    {
+      "version": "0.6",
+      "copyright": "OpenStreetMap and contributors",
+      "attribution": "http://www.openstreetmap.org/copyright",
+      "license": "http://opendatacommons.org/licenses/odbl/1-0/",
+      "sourceUrl": "https://api.openstreetmap.org/api/0.6/way/192187333/full.json",
+      "retrievedAt": "2026-11-04T14:19:32.044141Z",
+      "rawSha256": "8f246bd1a8a0a4141403850da80e12437aeb805d6983a7c4f4e3c4a4e83cfc1f",
+      "elements": [
+        {
+          "type": "node",
+          "id": 2027585490,
+          "lat": 22.1858894,
+          "lon": 113.5312081,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 2027585491,
+          "lat": 22.1858987,
+          "lon": 113.5313098,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 2027585503,
+          "lat": 22.1859775,
+          "lon": 113.5314032,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 2027585523,
+          "lat": 22.1861589,
+          "lon": 113.5313217,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 2027585526,
+          "lat": 22.1862373,
+          "lon": 113.5312005,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 4
+        },
+        {
+          "type": "node",
+          "id": 2027585531,
+          "lat": 22.1862475,
+          "lon": 113.5313123,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 3
+        },
+        {
+          "type": "node",
+          "id": 2168716983,
+          "lat": 22.1861645,
+          "lon": 113.5313833,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 7650128619,
+          "lat": 22.1859683,
+          "lon": 113.5313024,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 7650128623,
+          "lat": 22.1859907,
+          "lon": 113.5311974,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 2
+        },
+        {
+          "type": "node",
+          "id": 11084343989,
+          "lat": 22.1860473,
+          "lon": 113.5311514,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 2,
+          "tags": {
+            "entrance": "yes"
+          }
+        },
+        {
+          "type": "node",
+          "id": 12497573434,
+          "lat": 22.1862052,
+          "lon": 113.5312039,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 1
+        },
+        {
+          "type": "node",
+          "id": 12497573435,
+          "lat": 22.1861989,
+          "lon": 113.5311352,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 1
+        },
+        {
+          "type": "node",
+          "id": 12497573436,
+          "lat": 22.185987,
+          "lon": 113.5311578,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 1
+        },
+        {
+          "type": "node",
+          "id": 12497573451,
+          "lat": 22.1862022,
+          "lon": 113.5311711,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 1
+        },
+        {
+          "type": "node",
+          "id": 12497573458,
+          "lat": 22.1860582,
+          "lon": 113.5313946,
+          "timestamp": "2025-01-13T07:05:46Z",
+          "version": 1
+        },
+        {
+          "type": "way",
+          "id": 192187333,
+          "timestamp": "2025-04-27T04:48:31Z",
+          "version": 14,
+          "nodes": [
+            2027585526,
+            12497573434,
+            12497573451,
+            12497573435,
+            11084343989,
+            12497573436,
+            7650128623,
+            2027585490,
+            2027585491,
+            7650128619,
+            2027585503,
+            12497573458,
+            2168716983,
+            2027585523,
+            2027585531,
+            2027585526
+          ],
+          "tags": {
+            "alt_name": "媽祖廟",
+            "alt_name:zh": "媽祖廟",
+            "alt_name:zh-Hans": "妈祖庙",
+            "alt_name:zh-Hant": "媽祖廟",
+            "amenity": "place_of_worship",
+            "building": "yes",
+            "height": "8.2",
+            "name": "媽閣廟 Templo de A-Ma",
+            "name:en": "A-Ma Temple",
+            "name:ko": "아마 사원",
+            "name:pt": "Templo de A-Má",
+            "name:th": "วัดอาม่า เปิด 7-18.00",
+            "name:zh": "媽閣廟",
+            "name:zh-Hans": "妈阁庙",
+            "name:zh-Hant": "媽閣廟",
+            "religion": "buddhist",
+            "tourism": "attraction",
+            "wikidata": "Q2149114",
+            "wikimedia_commons": "Category:A-Ma Temple",
+            "wikipedia": "en:A-Ma Temple"
+          }
+        }
+      ]
+    }
+  ]
+}
