@@ -279,4 +279,14 @@ test.describe('D-05 SavedItinerary API with real SQLite', () => {
     expect(response.body.error.code).toBe('SOURCE_CHANGED');
     expect(await db.savedItinerary.count()).toBe(0);
   });
+
+  test('rejects a malformed trip UUID as BAD_REQUEST without writing', async () => {
+    const response = await request(app)
+      .post('/api/v1/trips/not-a-uuid/itineraries')
+      .send({ mode: 'create', candidate: candidate() });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.code).toBe('BAD_REQUEST');
+    expect(await db.savedItinerary.count()).toBe(0);
+  });
 });

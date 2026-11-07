@@ -17,6 +17,12 @@ function invalid(path: string, reason: string): never {
   });
 }
 
+function badRequest(path: string, reason: string): never {
+  throw new ItineraryError(400, 'BAD_REQUEST', '行程保存请求格式无效。', {
+    fields: [{ path, reason }],
+  });
+}
+
 function record(value: unknown, path: string, keys: string[]): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) invalid(path, '必须为对象');
   const result = value as Record<string, unknown>;
@@ -27,7 +33,7 @@ function record(value: unknown, path: string, keys: string[]): Record<string, un
 }
 
 function uuid(value: unknown, path: string): string {
-  if (typeof value !== 'string' || !uuidPattern.test(value)) invalid(path, '必须为 UUID');
+  if (typeof value !== 'string' || !uuidPattern.test(value)) badRequest(path, '必须为 UUID');
   return value;
 }
 
