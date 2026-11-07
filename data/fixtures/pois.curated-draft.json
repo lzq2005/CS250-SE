@@ -1,0 +1,193 @@
+[
+  {
+    "id": "273024e3-ae0c-5172-a486-e460efb96639",
+    "name": "郑家大屋",
+    "category": "history",
+    "tags": [
+      "历史",
+      "建筑"
+    ],
+    "position": {
+      "lat": 22.1885481,
+      "lng": 113.5343871
+    },
+    "address": "Travessa de António da Silva, no. 10, Macau",
+    "openingHours": [
+      {
+        "weekday": 1,
+        "open": "10:00",
+        "close": "18:00",
+        "lastEntry": "17:30"
+      },
+      {
+        "weekday": 2,
+        "open": "10:00",
+        "close": "18:00",
+        "lastEntry": "17:30"
+      },
+      {
+        "weekday": 4,
+        "open": "10:00",
+        "close": "18:00",
+        "lastEntry": "17:30"
+      },
+      {
+        "weekday": 5,
+        "open": "10:00",
+        "close": "18:00",
+        "lastEntry": "17:30"
+      },
+      {
+        "weekday": 6,
+        "open": "10:00",
+        "close": "18:00",
+        "lastEntry": "17:30"
+      },
+      {
+        "weekday": 7,
+        "open": "10:00",
+        "close": "18:00",
+        "lastEntry": "17:30"
+      }
+    ],
+    "suggestedVisitMinutes": null,
+    "price": {
+      "amountMinor": 0,
+      "currency": "MOP"
+    },
+    "verification": "estimated",
+    "sourceUrl": "https://www.culturalheritage.mo/en/detail/102524",
+    "checkedAt": "2026-11-04T14:25:43.215Z",
+    "bookingNote": "范围为郑家大屋普通参观；周三关闭，其他星期含公众假期按官方规则开放。导赏另有场次，现场限流以公告为准。坐标为 OpenStreetMap 地物面内代表点估计，不是已核实入口；© OpenStreetMap contributors，ODbL 1.0。建议时长未知。"
+  },
+  {
+    "id": "11930ad8-8106-5262-8350-aff2f9b0e65f",
+    "name": "卢家大屋",
+    "category": "history",
+    "tags": [
+      "历史",
+      "建筑"
+    ],
+    "position": {
+      "lat": 22.1942349,
+      "lng": 113.5412366
+    },
+    "address": "Travessa da Sé, no. 7",
+    "openingHours": [
+      {
+        "weekday": 2,
+        "open": "10:00",
+        "close": "18:00",
+        "lastEntry": "17:30"
+      },
+      {
+        "weekday": 3,
+        "open": "10:00",
+        "close": "18:00",
+        "lastEntry": "17:30"
+      },
+      {
+        "weekday": 4,
+        "open": "10:00",
+        "close": "18:00",
+        "lastEntry": "17:30"
+      },
+      {
+        "weekday": 5,
+        "open": "10:00",
+        "close": "18:00",
+        "lastEntry": "17:30"
+      },
+      {
+        "weekday": 6,
+        "open": "10:00",
+        "close": "18:00",
+        "lastEntry": "17:30"
+      },
+      {
+        "weekday": 7,
+        "open": "10:00",
+        "close": "18:00",
+        "lastEntry": "17:30"
+      }
+    ],
+    "suggestedVisitMinutes": null,
+    "price": {
+      "amountMinor": 0,
+      "currency": "MOP"
+    },
+    "verification": "estimated",
+    "sourceUrl": "https://www.culturalheritage.mo/en/detail/102523",
+    "checkedAt": "2026-11-04T14:25:43.215Z",
+    "bookingNote": "范围为卢家大屋普通参观；周一关闭，其他星期含公众假期按官方规则开放。导赏另有场次。坐标为 OpenStreetMap 地物面内代表点估计，不是已核实入口；© OpenStreetMap contributors，ODbL 1.0。建议时长未知。"
+  },
+  {
+    "id": "8913d2bd-feaf-509d-8c02-560ef2e41510",
+    "name": "大三巴牌坊",
+    "category": "history",
+    "tags": [
+      "历史",
+      "建筑"
+    ],
+    "position": {
+      "lat": 22.1974569,
+      "lng": 113.5408602
+    },
+    "address": "Largo da Companhia de Jesus",
+    "openingHours": null,
+    "suggestedVisitMinutes": null,
+    "price": {
+      "amountMinor": 0,
+      "currency": "MOP"
+    },
+    "verification": "estimated",
+    "sourceUrl": "https://www.culturalheritage.mo/en/detail/102522",
+    "checkedAt": "2026-11-04T14:25:43.215Z",
+    "bookingNote": "范围为大三巴地标／遗址复合参观，不包含大炮台。外立面全天可见，遗址及博物馆另有入场时段；不存在可靠的统一窗口，整体营业时间待核实，不表示全天开放。博物馆及墓室周二下午另有限制。坐标为 OpenStreetMap 地物面内代表点估计，不是已核实入口；© OpenStreetMap contributors，ODbL 1.0。建议时长未知。"
+  },
+  {
+    "id": "24775c63-c4f7-51de-81d8-5b4b83481aba",
+    "name": "东望洋炮台及灯塔",
+    "category": "history",
+    "tags": [
+      "历史",
+      "建筑"
+    ],
+    "position": {
+      "lat": 22.1965806,
+      "lng": 113.549691
+    },
+    "address": "Guia Hill",
+    "openingHours": null,
+    "suggestedVisitMinutes": null,
+    "price": {
+      "amountMinor": 0,
+      "currency": "MOP"
+    },
+    "verification": "estimated",
+    "sourceUrl": "https://www.culturalheritage.mo/en/detail/102521",
+    "checkedAt": "2026-11-04T14:25:43.215Z",
+    "bookingNote": "范围为东望洋炮台地标及外部参观，不承诺进入灯塔。炮台及资讯中心 09:00–18:00、17:30 停止入场；教堂 10:00–17:00；灯塔内部不开放。不同区域不合并为统一窗口，整体营业时间待核实。坐标为 OpenStreetMap 地物面内代表点估计，不是已核实入口；© OpenStreetMap contributors，ODbL 1.0。建议时长未知。"
+  },
+  {
+    "id": "dc3578b4-eed7-56f4-9f2b-6c627d6cfb93",
+    "name": "妈阁庙",
+    "category": "history",
+    "tags": [
+      "历史",
+      "建筑"
+    ],
+    "position": {
+      "lat": 22.1860752,
+      "lng": 113.5312645
+    },
+    "address": "澳门妈阁山西坡",
+    "openingHours": null,
+    "suggestedVisitMinutes": null,
+    "price": null,
+    "verification": "estimated",
+    "sourceUrl": "https://www.wh.gov.mo/en/site/detail/1",
+    "checkedAt": "2026-11-04T14:25:43.215Z",
+    "bookingNote": "范围为妈阁庙庙宇建筑群，不是妈阁庙公交站或妈祖文化村。官方开放时段存在 07:00 与 08:00 起始差异，营业窗口未知；费用未取得可靠依据，保持未知。地址使用文化局的地理位置描述，非精确门牌。坐标为 OpenStreetMap 地物面内代表点估计，不是已核实入口；© OpenStreetMap contributors，ODbL 1.0。建议时长未知。"
+  }
+]
