@@ -8,7 +8,12 @@ import type { GeoPoint, KnownStatus, Money, TravelMode } from '@tripmate/contrac
 export function estimateTravel(from: GeoPoint, to: GeoPoint, mode: TravelMode): {
   durationMinutes: number | null; estimatedCost: Money | null; estimateStatus: KnownStatus;
 } {
-  if (mode !== 'walk') return { durationMinutes: null, estimatedCost: null, estimateStatus: 'unknown' };
+  const validPoint = (point: GeoPoint) => Number.isFinite(point.lat) && point.lat >= -90 && point.lat <= 90 &&
+    Number.isFinite(point.lng) && point.lng >= -180 && point.lng <= 180;
+  // Never emit a fabricated duration or free fare for invalid coordinates.
+  if (mode !== 'walk' || !validPoint(from) || !validPoint(to)) {
+    return { durationMinutes: null, estimatedCost: null, estimateStatus: 'unknown' };
+  }
   if (from.lat === to.lat && from.lng === to.lng) {
     return { durationMinutes: 0, estimatedCost: { amountMinor: 0, currency: 'MOP' }, estimateStatus: 'estimated' };
   }
