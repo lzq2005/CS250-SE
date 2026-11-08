@@ -87,6 +87,7 @@ describe('generatePlan: shared contract', () => {
 
   it('reports a known missed last entry even when the transport duration is unknown', () => {
     const input = plannerInput([poi(firstId, {
+      position: { ...position, lat: NaN },
       openingHours: [{ weekday: 1, open: '09:00', close: '10:00', lastEntry: '09:30' }],
     })]);
     input.defaultTravelMode = 'bus';
@@ -139,6 +140,7 @@ describe('generatePlan: shared contract', () => {
       input.trip.endDate = '2026-11-03';
       input.trip.dayWindows.push({ date: '2026-11-03', start: '10:00', end: '18:00' });
       input.defaultTravelMode = 'bus';
+      input.trip.origin.position.lat = NaN;
       const result = generatePlan(input);
       expect(selectedIds(result)).toEqual([firstId]);
       expect(result.unscheduled).toEqual([
@@ -167,6 +169,7 @@ describe('generatePlan: shared contract', () => {
   it('preserves a selection when its transport estimate is unknown', () => {
     const input = plannerInput([poi(firstId)]);
     input.defaultTravelMode = 'bus';
+    input.trip.origin.position.lat = NaN;
     const result = generatePlan(input);
     expect(selectedIds(result)).toEqual([firstId]);
     expect(result.status).not.toBe('feasible');
