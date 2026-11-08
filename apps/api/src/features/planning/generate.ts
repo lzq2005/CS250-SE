@@ -76,6 +76,7 @@ export function generatePlan(input: PlannerInput): PlanResult {
   for (const dayWindow of orderedWindows) {
     const day: ItineraryDay = { date: dayWindow.date, stops: [], legs: [] };
     let current = trip.origin.position;
+    let currentLabel = trip.origin.label;
     let lastPoiId: string | null = null;
     let activeGroup: string | null = null;
     let time = minutes(dayWindow.start);
@@ -92,7 +93,8 @@ export function generatePlan(input: PlannerInput): PlanResult {
           recordFailure({ poiId: poi.id, code: 'UNKNOWN_DURATION', reason: 'Visit duration is unknown.' });
           continue;
         }
-        const estimate = estimateTravel(current, poi.position, defaultTravelMode);
+        const nextLabel = `${poi.name} ${poi.address}`;
+        const estimate = estimateTravel(current, poi.position, defaultTravelMode, { fromLabel: currentLabel, toLabel: nextLabel });
         if (estimate.durationMinutes === null) {
           // Travel cannot take negative time. If a visit is impossible even
           // from the current departure time, its constraint is already known.
@@ -110,10 +112,17 @@ export function generatePlan(input: PlannerInput): PlanResult {
         const stop: PlannedStop = { id: stopId(trip.id, poi.id), poiId: poi.id, date: dayWindow.date, arrive: clock(arrive), start: clock(attempt.start), end: clock(attempt.end) };
         day.stops.push(stop);
         day.legs.push({ fromPoiId: lastPoiId, toPoiId: poi.id, mode: defaultTravelMode, ...estimate });
+        if (defaultTravelMode !== 'walk') warnings.push({
+          code: 'UNKNOWN_TRAVEL', poiId: poi.id, severity: 'warning',
+          message: defaultTravelMode === 'bus'
+            ? 'Simulated bus estimate: assumes one ride; route, transfers and live traffic are unknown.'
+            : 'Simulated taxi estimate: route, waiting, luggage and unrecognized surcharges may change the fare.',
+        });
         if (attempt.unknownHours) warnings.push({ code: 'UNKNOWN_HOURS', poiId: poi.id, severity: 'warning', message: 'Opening hours or last-entry information is unknown.' });
         remaining.delete(poi.id);
         failures.delete(poi.id);
         current = poi.position;
+        currentLabel = nextLabel;
         lastPoiId = poi.id;
         activeGroup = groups.get(poi.id) ?? null;
         time = attempt.end;
