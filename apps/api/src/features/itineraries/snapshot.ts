@@ -132,6 +132,18 @@ function unique(values: string[]): boolean {
   return new Set(values).size === values.length;
 }
 
+function coversEveryDate(startDate: string, endDate: string, dates: string[]): boolean {
+  const ordered = [...dates].sort();
+  let cursor = startDate;
+  for (const date of ordered) {
+    if (date !== cursor || date > endDate) return false;
+    const next = new Date(`${cursor}T00:00:00.000Z`);
+    next.setUTCDate(next.getUTCDate() + 1);
+    cursor = next.toISOString().slice(0, 10);
+  }
+  return cursor > endDate;
+}
+
 function money(value: unknown): Money {
   const candidate = record(value, ['amountMinor', 'currency']);
   return {
@@ -246,7 +258,7 @@ function trip(value: unknown): TripConfig {
     startDate > endDate ||
     !unique(dayWindows.map((item) => item.date)) ||
     !unique(interests) ||
-    dayWindows.some((item) => item.date < startDate || item.date > endDate)
+    !coversEveryDate(startDate, endDate, dayWindows.map((item) => item.date))
   ) {
     return corrupt();
   }
@@ -298,7 +310,7 @@ function plannedStop(value: unknown, dayDate: string): PlannedStop {
   if (date !== dayDate) return corrupt();
   const start = nullableLocalTime(candidate.start);
   const end = nullableLocalTime(candidate.end);
-  if ((start === null) !== (end === null) || (start !== null && end !== null && start >= end)) {
+  if (start !== null && end !== null && start >= end) {
     return corrupt();
   }
   return {
@@ -429,7 +441,13 @@ function timeOverride(value: unknown): TimeOverride {
   const candidate = record(value, ['stopId', 'start', 'end']);
   const start = localTime(candidate.start);
   const end = localTime(candidate.end);
-  if (start >= end) return corrupt();
+  if (
+    start >= end ||
+    Number(start.slice(3)) % 15 !== 0 ||
+    Number(end.slice(3)) % 15 !== 0
+  ) {
+    return corrupt();
+  }
   return { stopId: uuid(candidate.stopId), start, end };
 }
 
@@ -442,10 +460,15 @@ export function validateStoredSnapshot(
   const input = plannerInput(rawInput);
   const result = planResult(rawResult, input, tripId);
   const timeOverrides = array(rawTimeOverrides).map(timeOverride);
-  const stopIds = new Set(result.days.flatMap((day) => day.stops.map((stop) => stop.id)));
+  const stopById = new Map(
+    result.days.flatMap((day) => day.stops).map((stop) => [stop.id, stop]),
+  );
   if (
     !unique(timeOverrides.map((item) => item.stopId)) ||
-    timeOverrides.some((item) => !stopIds.has(item.stopId))
+    timeOverrides.some((item) => {
+      const stop = stopById.get(item.stopId);
+      return !stop || stop.start !== item.start || stop.end !== item.end;
+    })
   ) {
     return corrupt();
   }

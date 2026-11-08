@@ -25,6 +25,7 @@ const db = new PrismaClient({ datasourceUrl: databaseUrl });
 const writerDb = new PrismaClient({ datasourceUrl: databaseUrl });
 let sourceChanged = false;
 let plannerFailure: unknown = null;
+let generatedResult: PlanResult | null = null;
 let sourceVerifier:
   | ((input: PlannerInput, tx: Prisma.TransactionClient) => Promise<boolean>)
   | null = null;
@@ -103,10 +104,35 @@ const initialResult: PlanResult = {
   estimatedTotalCost: null,
 };
 
+const overnightDiagnosticResult: PlanResult = {
+  ...structuredClone(initialResult),
+  status: 'infeasible',
+  days: [
+    {
+      ...structuredClone(initialResult.days[0]!),
+      stops: [
+        {
+          ...structuredClone(initialResult.days[0]!.stops[0]!),
+          start: '23:50',
+          end: null,
+        },
+      ],
+    },
+  ],
+  warnings: [
+    {
+      code: 'DAY_END',
+      poiId,
+      message: '2026-11-10 的下一日（2026-11-11）00:20 结束。',
+      severity: 'error',
+    },
+  ],
+};
+
 const planner: PlannerService = {
   generatePlan: () => {
     throwPlannerFailure();
-    return structuredClone(initialResult);
+    return structuredClone(generatedResult ?? initialResult);
   },
   revalidateAndRecalculate: (input) => {
     throwPlannerFailure();
@@ -211,6 +237,7 @@ test.beforeAll(async () => {
 test.beforeEach(async () => {
   sourceChanged = false;
   plannerFailure = null;
+  generatedResult = null;
   sourceVerifier = null;
   await db.savedItinerary.deleteMany();
   await db.trip.update({
@@ -437,7 +464,7 @@ test.describe('D-05 SavedItinerary API with real SQLite', () => {
       },
       {
         field: 'timeOverrides',
-        value: [{ stopId: 'not-a-uuid', start: '99:99', end: 'broken' }],
+        value: [{ stopId, start: '10:07', end: '10:22' }],
       },
     ];
 
@@ -477,5 +504,130 @@ test.describe('D-05 SavedItinerary API with real SQLite', () => {
 
     expect(response.status).toBe(400);
     expect(response.body.error.code).toBe('BAD_REQUEST');
+  });
+
+  test('preserves a valid overnight diagnostic with an independently nullable end time', async () => {
+    generatedResult = overnightDiagnosticResult;
+
+    const created = await request(app)
+      .post(`/api/v1/trips/${tripId}/itineraries`)
+      .send({
+        mode: 'create',
+        candidate: {
+          input: structuredClone(plannerInput),
+          result: structuredClone(overnightDiagnosticResult),
+          commands: [],
+        },
+      });
+
+    expect(created.status).toBe(201);
+    expect(created.body.data.result).toMatchObject({
+      status: 'infeasible',
+      days: [{ stops: [{ start: '23:50', end: null }] }],
+      warnings: [{ code: 'DAY_END', severity: 'error' }],
+    });
+
+    const itineraryId = created.body.data.id as string;
+    const reopened = await request(app).get(`/api/v1/itineraries/${itineraryId}`);
+    const listed = await request(app).get(`/api/v1/trips/${tripId}/itineraries`);
+    expect(reopened.status).toBe(200);
+    expect(reopened.body.data).toEqual(created.body.data);
+    expect(listed.status).toBe(200);
+    expect(listed.body.data.items[0]).toEqual(created.body.data);
+
+    const edited = await request(app)
+      .post(`/api/v1/itineraries/${itineraryId}/edits`)
+      .send({
+        expectedVersion: 1,
+        command: {
+          type: 'setTransportMode',
+          date: '2026-11-10',
+          toPoiId: poiId,
+          mode: 'bus',
+        },
+      });
+    expect(edited.status).toBe(200);
+    expect(edited.body.data.result.days[0].stops[0]).toMatchObject({
+      start: '23:50',
+      end: null,
+    });
+    expect(edited.body.data.result.warnings).toContainEqual(
+      expect.objectContaining({ code: 'DAY_END', severity: 'error' }),
+    );
+  });
+
+  test('rejects snapshots missing required dates at the beginning, middle or end', async () => {
+    const cases = [
+      {
+        startDate: '2026-11-09',
+        endDate: '2026-11-10',
+        dayWindows: [{ date: '2026-11-10', start: '09:00', end: '18:00' }],
+        days: [structuredClone(initialResult.days[0]!)],
+      },
+      {
+        startDate: '2026-11-10',
+        endDate: '2026-11-12',
+        dayWindows: [
+          { date: '2026-11-10', start: '09:00', end: '18:00' },
+          { date: '2026-11-12', start: '09:00', end: '18:00' },
+        ],
+        days: [
+          structuredClone(initialResult.days[0]!),
+          { date: '2026-11-12', stops: [], legs: [] },
+        ],
+      },
+      {
+        startDate: '2026-11-10',
+        endDate: '2026-11-12',
+        dayWindows: [{ date: '2026-11-11', start: '09:00', end: '18:00' }],
+        days: [{ ...structuredClone(initialResult.days[0]!), date: '2026-11-11' }],
+      },
+      {
+        startDate: '2026-11-10',
+        endDate: '2026-11-11',
+        dayWindows: [{ date: '2026-11-10', start: '09:00', end: '18:00' }],
+        days: [structuredClone(initialResult.days[0]!)],
+      },
+    ];
+
+    for (const item of cases) {
+      await db.savedItinerary.deleteMany();
+      const created = await request(app)
+        .post(`/api/v1/trips/${tripId}/itineraries`)
+        .send({ mode: 'create', candidate: candidate() });
+      const itineraryId = created.body.data.id as string;
+      const corruptInput = structuredClone(plannerInput);
+      corruptInput.trip.startDate = item.startDate;
+      corruptInput.trip.endDate = item.endDate;
+      corruptInput.trip.dayWindows = item.dayWindows;
+      await db.savedItinerary.update({
+        where: { id: itineraryId },
+        data: {
+          input: corruptInput,
+          result: {
+            ...structuredClone(initialResult),
+            days: item.days,
+          },
+        },
+      });
+      const before = await db.savedItinerary.findUniqueOrThrow({ where: { id: itineraryId } });
+
+      const getResponse = await request(app).get(`/api/v1/itineraries/${itineraryId}`);
+      const listResponse = await request(app).get(`/api/v1/trips/${tripId}/itineraries`);
+      const editResponse = await request(app)
+        .post(`/api/v1/itineraries/${itineraryId}/edits`)
+        .send({
+          expectedVersion: 1,
+          command: { type: 'removeStop', stopId, confirmed: true },
+        });
+
+      for (const response of [getResponse, listResponse, editResponse]) {
+        expect(response.status).toBe(409);
+        expect(response.body.error.code).toBe('DATA_INTEGRITY_ERROR');
+      }
+      const after = await db.savedItinerary.findUniqueOrThrow({ where: { id: itineraryId } });
+      expect(after.version).toBe(before.version);
+      expect(after.updatedAt).toEqual(before.updatedAt);
+    }
   });
 });

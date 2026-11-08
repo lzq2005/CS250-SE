@@ -24,6 +24,9 @@ It does not implement planning, downstream propagation or conflict rules.
 Source verification, planner replay and the create/overwrite write occur in the same
 interactive transaction. Saved snapshots are fully validated on read; structurally invalid
 input, result or time override data returns `409 DATA_INTEGRITY_ERROR`.
+Result timing fields remain independently nullable so valid cross-midnight diagnostics can
+be saved and reopened. Time overrides stay non-null, quarter-hour values and must match the
+corresponding stop's locked start/end.
 
 The router is not registered in `app.ts` by D. Member A must register it after C's
 planner implementation and the source consistency adapter are available.
