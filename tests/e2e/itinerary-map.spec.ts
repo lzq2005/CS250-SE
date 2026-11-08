@@ -1,0 +1,164 @@
+import { expect, test } from '@playwright/test';
+
+type HarnessWindow = Window & {
+  __mapShellHarness?: {
+    mount: () => void;
+    unmount: () => void;
+  };
+};
+
+const firstDayPath = '/src/features/map/map-preview.html';
+const boundaryPath = '/src/features/map/map-preview.html?scenario=missing-poi';
+const invalidCoordinatePath = '/src/features/map/map-preview.html?scenario=invalid-coordinate';
+const unsafeNamePath = '/src/features/map/map-preview.html?scenario=unsafe-name';
+const transparentPng = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Z2X8AAAAASUVORK5CYII=',
+  'base64',
+);
+
+test.describe('D-02 itinerary map fixture preview', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('https://tile.openstreetmap.org/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'image/png', body: transparentPng }),
+    );
+  });
+
+  test('renders numbered markers in itinerary stop order', async ({ page }) => {
+    await page.goto(firstDayPath);
+
+    await expect(page.getByRole('heading', { level: 1, name: '行程地图' })).toBeVisible();
+    await expect(page.getByTestId('route-disclaimer')).toHaveText(
+      '连线仅表示行程顺序，不代表真实道路路线。',
+    );
+
+    const markers = page.getByTestId('map-stop-marker');
+    await expect(markers).toHaveCount(2);
+    await expect(markers.nth(0)).toHaveAttribute('data-sequence', '1');
+    await expect(markers.nth(0)).toHaveAttribute(
+      'data-poi-id',
+      '11111111-1111-4111-8111-111111111111',
+    );
+    await expect(markers.nth(1)).toHaveAttribute('data-sequence', '2');
+    await expect(markers.nth(1)).toHaveAttribute(
+      'data-poi-id',
+      '22222222-2222-4222-8222-222222222222',
+    );
+
+    const orderedRows = page.getByTestId('map-stop-row');
+    await expect(orderedRows).toHaveCount(2);
+    await expect(orderedRows.nth(0)).toContainText('大三巴牌坊');
+    await expect(orderedRows.nth(1)).toContainText('澳门博物馆');
+  });
+
+  test('updates markers when the active itinerary day changes', async ({ page }) => {
+    await page.goto(firstDayPath);
+
+    await page.getByRole('button', { name: '第 2 天 2026-11-04' }).click();
+
+    const markers = page.getByTestId('map-stop-marker');
+    await expect(markers).toHaveCount(1);
+    await expect(markers.first()).toHaveAttribute('data-sequence', '1');
+    await expect(markers.first()).toHaveAttribute(
+      'data-poi-id',
+      '33333333-3333-4333-8333-333333333333',
+    );
+
+    const orderedRows = page.getByTestId('map-stop-row');
+    await expect(orderedRows).toHaveCount(1);
+    await expect(orderedRows.first()).toContainText('龙环葡韵');
+  });
+
+  test('keeps sequence numbers and shows a missing-POI coordinate message', async ({ page }) => {
+    await page.goto(boundaryPath);
+
+    const orderedRows = page.getByTestId('map-stop-row');
+    await expect(orderedRows).toHaveCount(2);
+    await expect(orderedRows.nth(0)).toContainText('地点坐标不可用');
+    await expect(orderedRows.nth(1)).toContainText('澳门博物馆');
+
+    const markers = page.getByTestId('map-stop-marker');
+    await expect(markers).toHaveCount(1);
+    await expect(markers.first()).toHaveAttribute('data-sequence', '2');
+    await expect(markers.first()).toHaveAttribute(
+      'data-poi-id',
+      '22222222-2222-4222-8222-222222222222',
+    );
+  });
+
+  test('keeps map and ordered stops within a mobile viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(firstDayPath);
+
+    await expect(page.getByTestId('itinerary-map')).toBeVisible();
+    await expect(page.getByTestId('map-stop-marker')).toHaveCount(2);
+    await expect(page.getByTestId('map-stop-row')).toHaveCount(2);
+
+    const layout = await page.evaluate(() => ({
+      viewportWidth: document.documentElement.clientWidth,
+      contentWidth: document.documentElement.scrollWidth,
+    }));
+
+    expect(layout.contentWidth).toBeLessThanOrEqual(layout.viewportWidth);
+  });
+
+  test('rejects out-of-range coordinates without creating a marker', async ({ page }) => {
+    await page.goto(invalidCoordinatePath);
+
+    const orderedRows = page.getByTestId('map-stop-row');
+    await expect(orderedRows).toHaveCount(2);
+    await expect(orderedRows.nth(0)).toContainText('大三巴牌坊');
+    await expect(orderedRows.nth(0)).toContainText('地点坐标无效');
+
+    const markers = page.getByTestId('map-stop-marker');
+    await expect(markers).toHaveCount(1);
+    await expect(markers.first()).toHaveAttribute('data-sequence', '2');
+  });
+
+  test('renders POI tooltip text without interpreting HTML', async ({ page }) => {
+    await page.goto(unsafeNamePath);
+
+    const unsafeMarker = page.getByRole('button', { name: /第 1 站.*危险景点/ });
+    await unsafeMarker.dispatchEvent('mouseover');
+
+    const tooltip = page.locator('.leaflet-tooltip');
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toContainText('<img src=x onerror="window.__mapXss=1">危险景点');
+    await expect(tooltip.locator('img')).toHaveCount(0);
+    await expect(page.locator('body')).not.toHaveAttribute('data-injected', 'yes');
+  });
+
+  test('unmounts safely during rapid shell navigation and day switching', async ({ page }) => {
+    const pageErrors: string[] = [];
+    page.on('pageerror', (error) => pageErrors.push(error.message));
+
+    await page.goto('/#/map');
+    await page.addScriptTag({
+      url: '/src/features/map/map-shell-test-harness.ts',
+      type: 'module',
+    });
+    await page.waitForFunction(() =>
+      Boolean((window as HarnessWindow).__mapShellHarness),
+    );
+
+    for (let round = 0; round < 4; round += 1) {
+      await page.evaluate(() => (window as HarnessWindow).__mapShellHarness?.mount());
+      await expect(page.getByTestId('map-stop-marker')).toHaveCount(2);
+      await page.evaluate(() => {
+        window.location.hash = '#/home';
+      });
+      await page.waitForTimeout(650);
+      await page.evaluate(() => {
+        window.location.hash = '#/map';
+      });
+    }
+
+    await page.evaluate(() => (window as HarnessWindow).__mapShellHarness?.mount());
+    await page.getByRole('button', { name: '第 2 天 2026-11-04' }).click();
+    await page.evaluate(() => {
+      window.location.hash = '#/home';
+    });
+    await page.waitForTimeout(650);
+
+    expect(pageErrors).toEqual([]);
+  });
+});
