@@ -69,3 +69,28 @@ an injected adapter. A real save/version implementation remains D-05.
 
 The preview uses explicit test adapters. Single-stop replacement has no shared
 `EditCommand` and is therefore not added.
+
+## D-05 SavedItinerary persistence and reopening
+
+`SavedItineraryLibrary.vue` saves the current candidate as a version-1 snapshot,
+lists saved snapshots, reopens the complete saved `PlannerInput`/`PlanResult`,
+and exposes overwrite only through the D-04 confirmation flow. Reopening uses
+the stored snapshot and does not replace it with the latest Trip or POI data.
+
+`savedItineraryAdapter.ts` implements the shared D-05 HTTP boundary through
+`SaveItineraryRequest`, `EditRequest`, and `SavedItinerary`. A structured
+`VERSION_CONFLICT` from the backend is preserved for the UI; the library then
+refreshes the visible saved version without changing the user's candidate.
+
+```text
+/src/features/itinerary/saved-itinerary-preview.html
+```
+
+The preview uses `d05-test-adapter.ts` and is explicitly marked as test data.
+The real API adapter must not be presented as connected until Member A registers
+`createItinerariesRouter` with Member C's planner and the shared source verifier.
+
+Responsive preview captures:
+
+- `previews/saved-itinerary-390.png`
+- `previews/saved-itinerary-768.png`

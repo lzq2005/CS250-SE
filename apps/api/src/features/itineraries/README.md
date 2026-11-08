@@ -1,3 +1,32 @@
 # itineraries
 
-Owner: D. Bootstrap placeholder only. Export a Router for A to register through createApp modules; do not create a second server or modify Prisma migrations directly.
+Owner: D.
+
+## D-05 SavedItinerary persistence
+
+`createItinerariesRouter(db, dependencies)` implements the D-owned API boundary:
+
+- `POST /trips/:tripId/itineraries`
+- `GET /trips/:tripId/itineraries`
+- `GET /itineraries/:itineraryId`
+- `POST /itineraries/:itineraryId/edits`
+
+The router requires two dependencies:
+
+- `planner: PlannerService`: Member C's pure planning functions, used only to replay candidates and saved edits.
+- `verifySource(input, tx)`: A/B-owned source consistency check. It must read and compare
+  Trip, Targets, POIs and FX through the supplied Prisma transaction. Returning `false`
+  produces `409 SOURCE_CHANGED`.
+
+D owns validation, JSON snapshot persistence, optimistic version checks and reopening.
+It does not implement planning, downstream propagation or conflict rules.
+
+Source verification, planner replay and the create/overwrite write occur in the same
+interactive transaction. Saved snapshots are fully validated on read; structurally invalid
+input, result or time override data returns `409 DATA_INTEGRITY_ERROR`.
+Result timing fields remain independently nullable so valid cross-midnight diagnostics can
+be saved and reopened. Time overrides stay non-null, quarter-hour values and must match the
+corresponding stop's locked start/end.
+
+The router is not registered in `app.ts` by D. Member A must register it after C's
+planner implementation and the source consistency adapter are available.
