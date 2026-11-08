@@ -9,6 +9,24 @@ import type {
 } from '@tripmate/contracts';
 import { ItineraryError } from './errors.js';
 
+function isPlannerValidationFailure(error: unknown): boolean {
+  return Boolean(
+    error &&
+    typeof error === 'object' &&
+    'code' in error &&
+    (error as { code?: unknown }).code === 'VALIDATION_ERROR',
+  );
+}
+
+function plannerError(path: 'candidate' | 'command', error: unknown): ItineraryError {
+  if (isPlannerValidationFailure(error)) {
+    return new ItineraryError(422, 'VALIDATION_ERROR', '规划输入或命令无效。', {
+      fields: [{ path, reason: '规划输入或命令无效' }],
+    });
+  }
+  return new ItineraryError(500, 'INTERNAL_ERROR', '行程规划暂时失败。');
+}
+
 export function applyOverride(
   overrides: Map<string, TimeOverride>,
   command: EditCommand,
@@ -54,9 +72,7 @@ export async function replayCandidate(
     return { result, timeOverrides: [...overrides.values()] };
   } catch (error) {
     if (error instanceof ItineraryError) throw error;
-    throw new ItineraryError(422, 'VALIDATION_ERROR', '候选日程无法通过规划校验。', {
-      fields: [{ path: 'candidate', reason: error instanceof Error ? error.message : '规划校验失败' }],
-    });
+    throw plannerError('candidate', error);
   }
 }
 
@@ -81,9 +97,7 @@ export function replaySavedEdit(
     return { result, timeOverrides: [...overrides.values()] };
   } catch (error) {
     if (error instanceof ItineraryError) throw error;
-    throw new ItineraryError(422, 'VALIDATION_ERROR', '行程编辑无法通过规划校验。', {
-      fields: [{ path: 'command', reason: error instanceof Error ? error.message : '规划校验失败' }],
-    });
+    throw plannerError('command', error);
   }
 }
 

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import express from 'express';
 import request from 'supertest';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -22,7 +22,16 @@ const poiId = '92000000-0000-4000-8000-000000000001';
 const tempDirectory = mkdtempSync(join(tmpdir(), 'tripmate-d05-'));
 const databaseUrl = `file:${join(tempDirectory, 'saved.db').replaceAll('\\', '/')}`;
 const db = new PrismaClient({ datasourceUrl: databaseUrl });
+const writerDb = new PrismaClient({ datasourceUrl: databaseUrl });
 let sourceChanged = false;
+let plannerFailure: unknown = null;
+let sourceVerifier:
+  | ((input: PlannerInput, tx: Prisma.TransactionClient) => Promise<boolean>)
+  | null = null;
+
+function throwPlannerFailure(): void {
+  if (plannerFailure) throw plannerFailure;
+}
 
 const plannerInput: PlannerInput = {
   trip: {
@@ -95,8 +104,12 @@ const initialResult: PlanResult = {
 };
 
 const planner: PlannerService = {
-  generatePlan: () => structuredClone(initialResult),
+  generatePlan: () => {
+    throwPlannerFailure();
+    return structuredClone(initialResult);
+  },
   revalidateAndRecalculate: (input) => {
+    throwPlannerFailure();
     const result = structuredClone(input.current);
     const command = input.command;
     if (command.type === 'setVisitTime') {
@@ -141,7 +154,15 @@ app.use(
   '/api/v1',
   createItinerariesRouter(db, {
     planner,
-    verifySource: async () => !sourceChanged,
+    verifySource: async (input, tx) => {
+      if (sourceChanged) return false;
+      if (sourceVerifier) return sourceVerifier(input, tx);
+      const trip = await tx.trip.findUnique({
+        where: { id: input.trip.id },
+        select: { title: true },
+      });
+      return trip?.title === input.trip.title;
+    },
   }),
 );
 
@@ -163,6 +184,8 @@ test.beforeAll(async () => {
     },
   );
   if (migration.status !== 0) throw new Error(migration.stdout + migration.stderr);
+  await db.$queryRawUnsafe('PRAGMA journal_mode = WAL');
+  await writerDb.$queryRawUnsafe('PRAGMA journal_mode = WAL');
 
   await db.trip.create({
     data: {
@@ -187,10 +210,17 @@ test.beforeAll(async () => {
 
 test.beforeEach(async () => {
   sourceChanged = false;
+  plannerFailure = null;
+  sourceVerifier = null;
   await db.savedItinerary.deleteMany();
+  await db.trip.update({
+    where: { id: tripId },
+    data: { title: plannerInput.trip.title },
+  });
 });
 
 test.afterAll(async () => {
+  await writerDb.$disconnect();
   await db.$disconnect();
   rmSync(tempDirectory, { recursive: true, force: true });
 });
@@ -288,5 +318,164 @@ test.describe('D-05 SavedItinerary API with real SQLite', () => {
     expect(response.status).toBe(400);
     expect(response.body.error.code).toBe('BAD_REQUEST');
     expect(await db.savedItinerary.count()).toBe(0);
+  });
+
+  test('binds source verification to the write transaction and never publishes a stale snapshot', async () => {
+    let markVerificationRead!: () => void;
+    let releaseVerification!: () => void;
+    const verificationRead = new Promise<void>((resolve) => {
+      markVerificationRead = resolve;
+    });
+    const verificationRelease = new Promise<void>((resolve) => {
+      releaseVerification = resolve;
+    });
+
+    sourceVerifier = async (input, tx) => {
+      const trip = await tx.trip.findUnique({
+        where: { id: input.trip.id },
+        select: { title: true },
+      });
+      markVerificationRead();
+      await verificationRelease;
+      return trip?.title === input.trip.title;
+    };
+
+    const responsePromise = Promise.resolve(
+      request(app)
+        .post(`/api/v1/trips/${tripId}/itineraries`)
+        .send({ mode: 'create', candidate: candidate() }),
+    );
+
+    await verificationRead;
+    await writerDb.trip.update({
+      where: { id: tripId },
+      data: { title: 'changed after source verification' },
+    });
+    releaseVerification();
+
+    const response = await responsePromise;
+    expect(response.status).toBe(503);
+    expect(response.body.error.code).toBe('STORAGE_UNAVAILABLE');
+    expect(await db.savedItinerary.count()).toBe(0);
+  });
+
+  test('maps explicit planner validation failures to a safe 422 response', async () => {
+    plannerFailure = Object.assign(
+      new Error('private query SELECT * FROM /private/tripmate.db'),
+      { code: 'VALIDATION_ERROR' },
+    );
+
+    const response = await request(app)
+      .post(`/api/v1/trips/${tripId}/itineraries`)
+      .send({ mode: 'create', candidate: candidate() });
+
+    expect(response.status).toBe(422);
+    expect(response.body.error.code).toBe('VALIDATION_ERROR');
+    expect(response.body.error.details).toEqual({
+      fields: [{ path: 'candidate', reason: '规划输入或命令无效' }],
+    });
+    expect(JSON.stringify(response.body)).not.toContain('private');
+    expect(await db.savedItinerary.count()).toBe(0);
+  });
+
+  test('sanitizes unknown planner failures on create without writing', async () => {
+    plannerFailure = new Error('private query at C:\\secret\\tripmate.db');
+
+    const response = await request(app)
+      .post(`/api/v1/trips/${tripId}/itineraries`)
+      .send({ mode: 'create', candidate: candidate() });
+
+    expect(response.status).toBe(500);
+    expect(response.body.error.code).toBe('INTERNAL_ERROR');
+    expect(JSON.stringify(response.body)).not.toContain('private');
+    expect(await db.savedItinerary.count()).toBe(0);
+  });
+
+  test('sanitizes unknown planner failures on saved edit without changing the snapshot', async () => {
+    const created = await request(app)
+      .post(`/api/v1/trips/${tripId}/itineraries`)
+      .send({ mode: 'create', candidate: candidate() });
+    const itineraryId = created.body.data.id as string;
+    plannerFailure = new Error('private SQL SELECT * FROM SavedItinerary');
+
+    const response = await request(app)
+      .post(`/api/v1/itineraries/${itineraryId}/edits`)
+      .send({
+        expectedVersion: 1,
+        command: { type: 'setVisitTime', stopId, start: '11:00', end: '11:30' },
+      });
+
+    expect(response.status).toBe(500);
+    expect(response.body.error.code).toBe('INTERNAL_ERROR');
+    expect(JSON.stringify(response.body)).not.toContain('private');
+    expect((await request(app).get(`/api/v1/itineraries/${itineraryId}`)).body.data)
+      .toEqual(created.body.data);
+  });
+
+  test('rejects every malformed stored snapshot as DATA_INTEGRITY_ERROR', async () => {
+    const corruptions: Array<{
+      field: 'input' | 'result' | 'timeOverrides';
+      value: Prisma.InputJsonValue;
+    }> = [
+      {
+        field: 'input',
+        value: {
+          trip: { id: tripId },
+          selectedPois: [],
+          defaultTravelMode: 'rocket',
+          fxRates: [],
+        },
+      },
+      {
+        field: 'result',
+        value: {
+          tripId,
+          days: [],
+          status: 'BROKEN',
+          warnings: 'NOT_AN_ARRAY',
+        },
+      },
+      {
+        field: 'timeOverrides',
+        value: [{ stopId: 'not-a-uuid', start: '99:99', end: 'broken' }],
+      },
+    ];
+
+    for (const corruption of corruptions) {
+      await db.savedItinerary.deleteMany();
+      const created = await request(app)
+        .post(`/api/v1/trips/${tripId}/itineraries`)
+        .send({ mode: 'create', candidate: candidate() });
+      const itineraryId = created.body.data.id as string;
+      await db.savedItinerary.update({
+        where: { id: itineraryId },
+        data: { [corruption.field]: corruption.value },
+      });
+      const before = await db.savedItinerary.findUniqueOrThrow({ where: { id: itineraryId } });
+
+      const getResponse = await request(app).get(`/api/v1/itineraries/${itineraryId}`);
+      const listResponse = await request(app).get(`/api/v1/trips/${tripId}/itineraries`);
+      const editResponse = await request(app)
+        .post(`/api/v1/itineraries/${itineraryId}/edits`)
+        .send({
+          expectedVersion: 1,
+          command: { type: 'removeStop', stopId, confirmed: true },
+        });
+
+      for (const response of [getResponse, listResponse, editResponse]) {
+        expect(response.status).toBe(409);
+        expect(response.body.error.code).toBe('DATA_INTEGRITY_ERROR');
+      }
+      const after = await db.savedItinerary.findUniqueOrThrow({ where: { id: itineraryId } });
+      expect(after.version).toBe(before.version);
+      expect(after.updatedAt).toEqual(before.updatedAt);
+    }
+  });
+
+  test('maps malformed Express route encoding to BAD_REQUEST', async () => {
+    const response = await request(app).get('/api/v1/itineraries/%E0%A4%A');
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.code).toBe('BAD_REQUEST');
   });
 });

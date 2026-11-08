@@ -10,31 +10,29 @@ import type {
 } from '@tripmate/contracts';
 import { ItineraryError } from './errors.js';
 import { replayCandidate, replaySavedEdit } from './replay.js';
+import { validateStoredSnapshot } from './snapshot.js';
 
 export type SavedItineraryDependencies = {
   planner: PlannerService;
-  verifySource: (input: PlannerInput) => Promise<boolean>;
+  /**
+   * Must read and compare Trip, Targets, POIs and FX through the supplied transaction.
+   * Opening an independent connection would reintroduce the source-change window.
+   */
+  verifySource: (
+    input: PlannerInput,
+    tx: Prisma.TransactionClient,
+  ) => Promise<boolean>;
 };
 
 type SavedRow = Prisma.SavedItineraryGetPayload<Record<string, never>>;
 
-function stored<T>(value: Prisma.JsonValue): T {
-  return value as unknown as T;
-}
-
 function toSaved(row: SavedRow): SavedItinerary {
-  const input = stored<PlannerInput>(row.input);
-  const result = stored<PlanResult>(row.result);
-  const timeOverrides = stored<TimeOverride[]>(row.timeOverrides);
-  if (
-    !input?.trip ||
-    !result?.days ||
-    !Array.isArray(timeOverrides) ||
-    input.trip.id !== row.tripId ||
-    result.tripId !== row.tripId
-  ) {
-    throw new ItineraryError(409, 'DATA_INTEGRITY_ERROR', '已保存行程数据损坏。');
-  }
+  const { input, result, timeOverrides } = validateStoredSnapshot(
+    row.input,
+    row.result,
+    row.timeOverrides,
+    row.tripId,
+  );
   return {
     id: row.id,
     tripId: row.tripId,
@@ -64,10 +62,11 @@ function ensureCandidateTrip(candidate: SaveItineraryRequest['candidate'], tripI
 }
 
 async function verifyAndReplay(
+  tx: Prisma.TransactionClient,
   candidate: SaveItineraryRequest['candidate'],
   dependencies: SavedItineraryDependencies,
 ): Promise<{ result: PlanResult; timeOverrides: TimeOverride[] }> {
-  const sourceUnchanged = await dependencies.verifySource(candidate.input);
+  const sourceUnchanged = await dependencies.verifySource(candidate.input, tx);
   if (!sourceUnchanged) {
     throw new ItineraryError(409, 'SOURCE_CHANGED', 'Trip、targets、POI 或 FX 已变化，请重新生成。');
   }
@@ -86,9 +85,9 @@ export function createSavedItineraryService(
   return {
     async create(tripId: string, candidate: SaveItineraryRequest['candidate']): Promise<SavedItinerary> {
       ensureCandidateTrip(candidate, tripId);
-      const replayed = await verifyAndReplay(candidate, dependencies);
       return db.$transaction(async (tx) => {
         await ensureTrip(tx, tripId);
+        const replayed = await verifyAndReplay(tx, candidate, dependencies);
         const row = await tx.savedItinerary.create({
           data: {
             tripId,
@@ -123,7 +122,6 @@ export function createSavedItineraryService(
       request: Extract<SaveItineraryRequest, { mode: 'overwrite' }>,
     ): Promise<SavedItinerary> {
       ensureCandidateTrip(request.candidate, tripId);
-      const replayed = await verifyAndReplay(request.candidate, dependencies);
       return db.$transaction(async (tx) => {
         const current = await tx.savedItinerary.findUnique({ where: { id: request.itineraryId } });
         if (!current || current.tripId !== tripId) {
@@ -135,6 +133,7 @@ export function createSavedItineraryService(
             actualVersion: current.version,
           });
         }
+        const replayed = await verifyAndReplay(tx, request.candidate, dependencies);
         const updated = await tx.savedItinerary.updateMany({
           where: {
             id: request.itineraryId,

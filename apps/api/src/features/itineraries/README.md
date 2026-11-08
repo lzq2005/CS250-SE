@@ -14,11 +14,16 @@ Owner: D.
 The router requires two dependencies:
 
 - `planner: PlannerService`: Member C's pure planning functions, used only to replay candidates and saved edits.
-- `verifySource(input)`: A/B-owned source consistency check. Returning `false` produces
-  `409 SOURCE_CHANGED`.
+- `verifySource(input, tx)`: A/B-owned source consistency check. It must read and compare
+  Trip, Targets, POIs and FX through the supplied Prisma transaction. Returning `false`
+  produces `409 SOURCE_CHANGED`.
 
 D owns validation, JSON snapshot persistence, optimistic version checks and reopening.
 It does not implement planning, downstream propagation or conflict rules.
+
+Source verification, planner replay and the create/overwrite write occur in the same
+interactive transaction. Saved snapshots are fully validated on read; structurally invalid
+input, result or time override data returns `409 DATA_INTEGRITY_ERROR`.
 
 The router is not registered in `app.ts` by D. Member A must register it after C's
 planner implementation and the source consistency adapter are available.

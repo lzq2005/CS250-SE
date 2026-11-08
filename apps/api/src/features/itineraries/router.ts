@@ -67,6 +67,10 @@ export function createItinerariesRouter(
   });
 
   router.use((error: unknown, _req: Request, res: Response, next: NextFunction) => {
+    if (error instanceof URIError) {
+      const result = failure(400, 'BAD_REQUEST', '请求 URL 格式无效。');
+      return res.status(result.status).json(result.body);
+    }
     if (error instanceof ItineraryError) {
       const result = failure(error.status, error.code, error.message, error.details);
       return res.status(result.status).json(result.body);
@@ -74,7 +78,7 @@ export function createItinerariesRouter(
     if (
       error instanceof Prisma.PrismaClientInitializationError ||
       (error instanceof Prisma.PrismaClientKnownRequestError &&
-        ['P1001', 'P1002', 'P1003', 'P1008', 'P1017', 'P2024'].includes(error.code))
+        ['P1001', 'P1002', 'P1003', 'P1008', 'P1017', 'P2024', 'P2028', 'P2034'].includes(error.code))
     ) {
       const result = failure(503, 'STORAGE_UNAVAILABLE', '数据库暂时不可用。');
       return res.status(result.status).json(result.body);
