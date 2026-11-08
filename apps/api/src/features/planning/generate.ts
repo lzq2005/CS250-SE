@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
-import type { GeoPoint, ItineraryDay, PlannedStop, PlannerInput, PlanResult, PlanWarning, POI, WarningCode } from '@tripmate/contracts';
+import type { ItineraryDay, PlannedStop, PlannerInput, PlanResult, PlanWarning, POI, WarningCode } from '@tripmate/contracts';
 import { calculateCost } from './cost.js';
+import { groupNearbyPois, orderCandidates } from './geography.js';
 import { estimateTravel } from './travel.js';
 
 type Unscheduled = PlanResult['unscheduled'][number];
@@ -15,11 +16,6 @@ function weekday(date: string): number {
   value.setUTCFullYear(year, month - 1, day);
   const jsDay = value.getUTCDay();
   return jsDay === 0 ? 7 : jsDay;
-}
-function distanceSquared(a: GeoPoint, b: GeoPoint): number {
-  const lat = a.lat - b.lat;
-  const lng = (a.lng - b.lng) * Math.cos((a.lat + b.lat) * Math.PI / 360);
-  return lat * lat + lng * lng;
 }
 function stopId(tripId: string, poiId: string): string {
   const hex = createHash('sha256').update('tripmate-stop\0').update(tripId).update('\0').update(poiId).digest('hex').slice(0, 32).split('');
@@ -61,6 +57,7 @@ export function generatePlan(input: PlannerInput): PlanResult {
   if (trip.pace === 'relaxed') throw new Error('OPTION_NOT_ENABLED');
   const remaining = new Map<string, POI>();
   for (const poi of input.selectedPois) if (!remaining.has(poi.id)) remaining.set(poi.id, poi);
+  const groups = groupNearbyPois([...remaining.values()]);
   const failures = new Map<string, Unscheduled>();
   // A closed or full day does not prove the whole trip infeasible if another
   // day could not be evaluated because required information was unknown.
@@ -77,11 +74,12 @@ export function generatePlan(input: PlannerInput): PlanResult {
     const day: ItineraryDay = { date: dayWindow.date, stops: [], legs: [] };
     let current = trip.origin.position;
     let lastPoiId: string | null = null;
+    let activeGroup: string | null = null;
     let time = minutes(dayWindow.start);
     const dayEnd = minutes(dayWindow.end);
     while (remaining.size > 0) {
       let scheduled = false;
-      const candidates = [...remaining.values()].sort((a, b) => distanceSquared(current, a.position) - distanceSquared(current, b.position) || a.id.localeCompare(b.id));
+      const candidates = orderCandidates([...remaining.values()], current, groups, activeGroup);
       for (const poi of candidates) {
         if (poi.openingHours !== null && !poi.openingHours.some(window => window.weekday === weekday(dayWindow.date))) {
           recordFailure({ poiId: poi.id, code: 'CLOSED', reason: 'Closed on this day.' });
@@ -114,6 +112,7 @@ export function generatePlan(input: PlannerInput): PlanResult {
         failures.delete(poi.id);
         current = poi.position;
         lastPoiId = poi.id;
+        activeGroup = groups.get(poi.id) ?? null;
         time = attempt.end;
         scheduled = true;
         break;
