@@ -1,10 +1,8 @@
-# B-04 Targets 前端接入准备 — 2026-11-06
+# B-04 Targets 前端接入 — 2026-11-12
 
 ## 分支与依赖
 
-独立分支 `feat/b/B-04-targets-ui` 从 POI 分支的 `8bd2d52` 建立。PR #10 和后端 PR #11 不受本次修改影响，也没有把它们互相合入。
-
-本分支依赖 PR #10 的实际 Shell、DiscoveryPage 和单一 activeTrip；运行 Targets 操作还依赖 PR #11 后端的审核合入及 A 的注册。独立分支不是“无依赖功能已上线”。后续先同步已批准的依赖，再提交独立前端 PR，避免把依赖提交误算作本批改动。
+独立分支 `feat/b/B-04-targets-ui` 已同步 `main=7331434`，使用 PR #10 的 Shell、DiscoveryPage 和共享 activeTrip，以及 PR #11 的 Targets 后端。A 的正式接口注册在 PR #17，待合入并确认试点数据后执行正式验收。
 
 ## 已实现
 
@@ -20,12 +18,16 @@
 ## 验证与限制
 
 - lint、typecheck、build 通过。
-- `npm test -- --maxWorkers=2`：120 tests 通过（原111 + 客户端9）。默认 `npm run check` 在 A 原有 trips 迁移 beforeAll 超过10秒，24项未执行；限制本地并发复核后全部通过，没有更改公共配置或 A 测试。不能把首次默认 check 写为通过。
-- `npx playwright test -c apps/web/src/features/discovery/playwright.config.ts`：9个通过（原POI4 + Targets5），本地设置 `TRIPMATE_BROWSER_CHANNEL=chrome`。
+- `npm test -- --maxWorkers=2` 共10个文件、173项通过，包含main的164项及Targets客户端9项。
+- Chrome浏览器共37项通过。Discovery受控HTTP 9项，隔离Trip／POI 7项，Shell与共享页面21项。
 - Targets 浏览器用例显式控制 HTTP：读取／加入／刷新／移除、无旅行不请求、未注册接口不假成功、重复409、503结果未确认、POST404区分旅行有效／删除、切Trip旧响应隔离，以及320/390/768px。
-- 原 live 配置复核结果另见本次接续记录；它仅覆盖已有 Trip/POI/组件链路，不包含正式 Targets 注册。
+- 仓库外组合副本通过1项真实Router与临时SQLite浏览器验证。收藏、加入、刷新、切换测试旅行、移除及取消收藏均读写对应接口，两个旅行的目标保持独立。
 
-生产组件没有 fixture fallback，没有注册 API、没有修改 Schema／公共类型／A 或 D 组件／共享 CI，也没有在正常数据库导入 POI。受控测试不等于正式 Trip → POI → Targets 全链路已完成。
+## 与收藏前端的合并交接
+
+收藏 PR #19 与本分支都改动 `DiscoveryPage.vue` 的组件导入和详情操作区域。组合副本已验证解决方式：保留 `FavoriteAction` 与 `TargetActions` 的导入和组件，替换详情操作区域的占位按钮。建议先处理收藏 PR，随后同步 Targets 并按该方式处理两处冲突，再运行组合验证。
+
+正式链路验收使用 A 注册后的入口及获准的数据。组合验证的 Router 由临时服务注入，数据库为一次性 SQLite。
 
 ## A 入口就绪后的验收
 
@@ -33,4 +35,4 @@
 2. 最终目标库由 A 手动 dry-run，查同名地点和固定 UUID；数据获批后才显式写入，不自动加载待审数据。
 3. 使用真实 Trip 保存／恢复，搜索并查看固定 UUID 地点，加入、重复加入、移除、刷新后重读。
 4. 在两个真实 Trip 间切换，确认目标独立、Favorite 不变、历史快照不改写；记录实际 HTTP 和数据库证据。
-5. 配合 A/D 接入 CI；PR #10 保持组长要求的 Draft 状态。
+5. 配合 A/D 核对正式入口及 CI，在完成页面验收后交付。
