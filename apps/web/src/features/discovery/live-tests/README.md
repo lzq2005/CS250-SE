@@ -31,3 +31,9 @@ npx playwright test -c apps/web/src/features/discovery/playwright.live.config.ts
 3. B Shell 挂载 D 的实际 ItineraryDisplay 组件，测试入口显式提供 D 组件测试 props，检查唯一主导航、刷新／返回和 320/390/768px。不是 D-05 真实保存行程后端集成。
 
 目前合计6个用例。B-01 已合并，主导航和 activeTrip 已接线；仍待 A 正式注册／手动 Seed 接入、目标库确认、D 正式数据适配及 D-05 统一动态路由。旧5174草稿没有被替换。
+
+## A-05 / D-02 main同步复核 — 2026-11-06
+
+已无冲突同步main d93c24f。新增第7个用例在实际Shell唯一出口挂载实际D-02地图，320/390/768px重复进入、切日、退出，检查pageerror、唯一导航和首页标题样式不变。地图使用明确测试props，OSM瓦片受控替换，不能写成所有7个用例均无HTTP拦截或正式地图数据已接入。原6个用例也通过。
+
+B-owned Shell配置另运行全部原共享E2E，包括A-05 Companion和D-02原套件，共21项通过；都复用本隔离API，不写正常演示库。PR #11和本地Targets前端未混入，此处不验证正式Targets端到端。

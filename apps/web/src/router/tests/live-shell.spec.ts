@@ -60,3 +60,30 @@ test('actual B Shell embeds actual D component; D receives props and never owns 
   }
   expect(errors).toEqual([]);
 });
+
+test('merged D02 map mounts in sole Shell outlet and survives rapid navigation at all widths', async ({ page }) => {
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  // Provider availability is outside this component regression; Leaflet itself is real.
+  await page.route('https://tile.openstreetmap.org/**', route => route.fulfill({ status: 200, contentType: 'image/png', body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Z2X8AAAAASUVORK5CYII=', 'base64') }));
+  await page.goto('/src/router/tests/integration-preview.html');
+  const headingBefore = await page.locator('#home-title').evaluate(el => getComputedStyle(el).fontSize);
+  for (const width of [320, 390, 768]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (let round = 0; round < 3; round++) {
+      await page.locator('.bottom-nav a[href="#/map"]').click();
+      await expect(page.getByTestId('map-stop-marker')).toHaveCount(2);
+      await expect(page.getByRole('navigation', { name: '主导航', exact: true })).toHaveCount(1);
+      await expect(page.locator('.bottom-nav [aria-current="page"]')).toHaveAttribute('href', '#/map');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await page.getByRole('button', { name: '第 2 天 2026-11-04' }).click();
+      await expect(page.getByTestId('map-stop-marker')).toHaveCount(1);
+      await page.locator('.bottom-nav a[href="#/home"]').click();
+      await expect(page.getByTestId('itinerary-map')).toHaveCount(0);
+      // Wait beyond Leaflet's former deferred zoom callback before remounting.
+      await page.waitForTimeout(300);
+    }
+  }
+  await page.setViewportSize({ width: 1280, height: 720 });
+  expect(await page.locator('#home-title').evaluate(el => getComputedStyle(el).fontSize)).toBe(headingBefore);
+  expect(errors).toEqual([]);
+});

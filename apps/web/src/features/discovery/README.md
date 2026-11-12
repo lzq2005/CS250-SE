@@ -28,7 +28,7 @@ Synthetic POIs live only in `browser-tests/pois.synthetic.json`, are tagged `SYN
 
 ## Verification — final review package, 2026-11-05
 
-Latest integration update: main `6aae40d` synced without conflicts. Shell navigation, TripSetup/activeTrip and controlled POI routes are connected. Unit/database total is 111 (97 existing + 14 route/state checks). Live browser suite has 6 cases: 3 real POI cases, real Shell/Trip/POI flow, controlled restoration-error case, and actual D component with test-only props. Original controlled Discovery suite has 4 cases. See live-tests/README.md. A's registration/manual Seed and final target-database integration remain pending. Earlier notes below describe the initial slice, not the latest completion status.
+Latest integration update (2026-11-06): merged main `d93c24f` including A-05/D-02 without conflict. Lint/typecheck/build and 131 unit/database tests with `--maxWorkers=2` pass. Browser regression: 21 Shell/shared + 7 live integration + 4 controlled Discovery = 32 passed. The live suite now mounts actual D-02 in the sole Shell outlet using explicit test props; provider tiles are controlled, not a real planning/provider acceptance. A-05 actual HTTP checks pass through the isolated app. PR #11 backend and the separately saved Targets frontend are not included. Production registration/Seed/target database and eventual Trip→POI→Targets acceptance remain pending. Earlier notes below are historical.
 
 - `npm run check`: lint/typecheck/73 unit and database tests/build passed (21 original + 22 POI backend + 9 client + 21 Seed/handoff cases).
 - `npx playwright test -c apps/web/src/features/discovery/playwright.config.ts`: 4 browser cases passed using installed Chrome via `TRIPMATE_BROWSER_CHANNEL=chrome`.
