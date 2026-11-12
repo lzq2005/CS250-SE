@@ -1,10 +1,10 @@
-# B-04 收藏前端接入准备 — 2026-11-06
+# B-04 收藏前端接入 — 2026-11-12
 
 ## 分支／依赖
 
-本地 `feat/b/B-04-favorites-ui` 基于 PR #10 的 `b19b8c5`。与 `feat/b/B-04-targets-ui=0fdc6a6` 分开；没有把 Targets 前端或 PR #11 后端混入本分支。当前是提交审核前的独立前端准备，不代表已上线。
+`feat/b/B-04-favorites-ui` 已同步 `main=7331434`，包含 PR #10 的 POI/Shell 与 PR #11 的 Favorites 后端。Targets 前端在 `feat/b/B-04-targets-ui=0fdc6a6`，各自提交审核。
 
-正式运行依赖 PR #10 的 POI/Shell、PR #11 的 Favorites 后端及 A 注册。前置合入后按团队顺序同步干净main、整理前端PR；本地准备不更改#10/#11状态。
+正常应用入口的 Router 注册由 A 的 PR #17 提供，目前待审核合入。收藏页面与已注册接口的联合验收依赖该入口和经确认的试点数据。
 
 ## 实现与契约
 
@@ -18,11 +18,11 @@
 
 ## 验证
 
-- lint/typecheck/build通过；`npm test -- --maxWorkers=2`：138项通过（PR #10基线131 + Favorite客户端7）；不包含独立PR #11的后端测试或Targets前端测试。
+- lint、typecheck、build通过。`npm test -- --maxWorkers=2` 共10个文件、171项通过，包含main的164项及收藏客户端7项。
 - Discovery受控HTTP浏览器8项通过（原POI4 + Favorite4），覆盖无Trip收藏、刷新、列表筛选／返回、无逐卡请求、未注册错误、失败重读、迟到响应和连续点击只提交一次。
-- Shell+共享浏览器21项通过；原live隔离集成7项通过，Favorites未在该真实测试服务器注册，明确验证错误，不声称真实收藏数据库链路完成。
+- Shell与共享浏览器回归21项通过，隔离Trip／POI集成7项通过。隔离服务覆盖收藏路由尚未注册时的错误提示。收藏持久化分别由后端组合测试和前端受控响应测试验证，联合验收列于下一节。
 - 320/390/768px无横向溢出；列表截图已视觉检查。截图使用显式合成数据，不是正式POI数据或正式导入证据。
-- 首轮浏览器测试发现缺省Boolean问题，修复后回归通过；原live用例旧占位文字也已更新为验证真实未注册状态。
+- 收藏用例及相关浏览器回归共36项，使用仓库现有Discovery、live和Shell三个Playwright配置，浏览器为Chrome。
 
 ## 尚待正式验收
 
