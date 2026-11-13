@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
-import type { Category, POI } from '@tripmate/contracts';
+import type { Category, POI, FavoriteState } from '@tripmate/contracts';
 import { listPois, getPoi } from './poi.api';
+import FavoriteAction from './FavoriteAction.vue';
 import type { ShellRoute } from '../../router/routes';
 const props = defineProps<{ route: ShellRoute; embedded?: boolean }>();
 const emit = defineEmits<{ navigate: [path: string, replace: boolean] }>();
@@ -16,7 +17,10 @@ const keyword = ref('');
 const category = ref<Category | ''>('');
 const items = ref<POI[]>([]);
 const detail = ref<POI | null>(null);
-const mode = computed(() => props.route.id === 'discover' ? 'list' : props.route.id === 'poi-detail' ? 'detail' : 'missing');
+const mode = computed(() => props.route.id === 'discover' || props.route.id === 'favorites' ? 'list' : props.route.id === 'poi-detail' ? 'detail' : 'missing');
+const favoritesOnly = computed(() => props.route.id === 'favorites' || new URLSearchParams(props.route.search).get('favoriteOnly') === 'true');
+const listPath = computed(() => favoritesOnly.value ? '/favorites' : '/discover');
+const favoriteNotice = ref('');
 const loading = ref(false);
 const error = ref('');
 const region = ref<HTMLElement | null>(null);
@@ -27,6 +31,7 @@ const query = computed(() => {
   const q = new URLSearchParams();
   if (keyword.value.trim()) q.set('search', keyword.value.trim());
   if (category.value) q.set('category', category.value);
+  if (favoritesOnly.value) q.set('favoriteOnly', 'true');
   return q.toString() ? `?${q}` : '';
 });
 const categoryName = (value: Category) => categories.find(c => c.id === value)?.label ?? value;
@@ -44,10 +49,10 @@ async function loadRoute(focus = true) {
   keyword.value = params.get('search') ?? '';
   const selected = params.get('category') ?? '';
   category.value = categories.some(c => c.id === selected) ? selected as Category | '' : '';
-  error.value = ''; detail.value = null; loading.value = true;
+  error.value = ''; favoriteNotice.value = ''; detail.value = null; loading.value = true;
   try {
     if (mode.value === 'list') {
-      const result = await gateway.list({ search: keyword.value, category: category.value || undefined }, request.signal);
+      const result = await gateway.list({ search: keyword.value, category: category.value || undefined, ...(favoritesOnly.value ? { favoriteOnly: true } : {}) }, request.signal);
       if (current === sequence) items.value = result.items;
     } else if (mode.value === 'detail') {
       const result = await gateway.detail(selectedRoute.poiId ?? '', request.signal);
@@ -65,7 +70,13 @@ async function loadRoute(focus = true) {
 function applyQuery() {
   clearTimeout(searchTimer);
   // Shell owns navigation; this feature only requests a location change.
-  emit('navigate', `/discover${query.value}`, true);
+  emit('navigate', `${listPath.value}${query.value}`, true);
+}
+function favoriteChanged(state: FavoriteState) {
+  if (favoritesOnly.value && mode.value === 'list' && !state.favorited) {
+    items.value = items.value.filter(poi => poi.id !== state.poiId);
+    favoriteNotice.value = '已取消收藏。';
+  }
 }
 function scheduleSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(applyQuery, 200); }
 function reset() { keyword.value = ''; category.value = ''; applyQuery(); }
@@ -79,7 +90,7 @@ onUnmounted(() => { sequence++; request?.abort(); clearTimeout(searchTimer); });
   <section class="content-region" ref="region" tabindex="-1" aria-label="景点探索">
     <section class="panel">
       <template v-if="mode === 'list'">
-        <div class="intro"><p class="eyebrow">DISCOVER YOUR NEXT STOP</p><h1>发现下一处心动</h1><p>寻找喜欢的澳门地点，查看参观信息。</p></div>
+        <div class="intro"><p class="eyebrow">{{ favoritesOnly ? 'YOUR FAVORITE PLACES' : 'DISCOVER YOUR NEXT STOP' }}</p><h1>{{ favoritesOnly ? '地点收藏' : '发现下一处心动' }}</h1><p>{{ favoritesOnly ? '留住喜欢的地点；收藏不会自动加入本次旅行。' : '寻找喜欢的澳门地点，查看参观信息。' }}</p></div>
         <form class="search-form" role="search" @submit.prevent="applyQuery">
           <label for="poi-search" class="visually-hidden">搜索景点</label>
           <input id="poi-search" v-model="keyword" type="search" placeholder="搜索名称、地址或标签" @input="scheduleSearch">
@@ -88,19 +99,21 @@ onUnmounted(() => { sequence++; request?.abort(); clearTimeout(searchTimer); });
         </form>
         <nav class="categories" aria-label="景点分类"><button v-for="item in categories" :key="item.id" :class="{ selected: category === item.id }" :aria-pressed="category === item.id" @click="category = item.id; applyQuery()">{{ item.symbol }} {{ item.label }}</button></nav>
       </template>
-      <template v-else><a class="back" :href="`#/discover${query}`">← 返回搜索结果</a><p class="eyebrow">POI DETAILS</p></template>
+      <template v-else><a class="back" :href="`#${listPath}${query}`">{{ favoritesOnly ? '← 返回收藏列表' : '← 返回搜索结果' }}</a><p class="eyebrow">POI DETAILS</p></template>
 
       <div v-if="loading" class="state" role="status"><span class="spinner"></span><h2>正在加载景点资料…</h2></div>
       <div v-else-if="error" class="state error" role="alert"><h2>资料暂时无法加载</h2><p>{{ error }}</p><button @click="loadRoute(false)">重新尝试</button></div>
       <template v-else-if="mode === 'list'">
         <p class="result-count" role="status">{{ items.length }} 个地点</p>
-        <div v-if="!items.length" class="state"><span class="state-symbol">⌕</span><h2>没有找到匹配的地点</h2><p>试试其他关键词，或清除筛选查看全部数据。</p><button @click="reset">查看全部地点</button></div>
+        <p v-if="favoriteNotice" role="status">{{ favoriteNotice }}</p>
+        <div v-if="!items.length" class="state"><span class="state-symbol">⌕</span><h2>{{ favoritesOnly ? '没有匹配的收藏地点' : '没有找到匹配的地点' }}</h2><p>{{ favoritesOnly ? '尚未收藏，或当前筛选下没有结果。' : '试试其他关键词，或清除筛选查看全部数据。' }}</p><button @click="reset">{{ favoritesOnly ? '清除收藏筛选' : '查看全部地点' }}</button><a v-if="favoritesOnly" class="button" href="#/discover">去发现地点</a></div>
         <div v-else class="poi-grid">
           <article v-for="poi in items" :key="poi.id" class="poi-card">
             <div class="category-art" :class="poi.category" aria-hidden="true">{{ categorySymbol(poi.category) }}</div>
             <div class="card-body"><span class="category-label">{{ categoryName(poi.category) }}</span><h2><a :href="`#/pois/${poi.id}${query}`">{{ poi.name }}</a></h2><p class="address">{{ poi.address }}</p>
               <div class="facts"><span>{{ priceLabel(poi) }}</span><span>{{ poi.openingHours === null ? '营业时间未知' : poi.openingHours.length === 0 ? '整周关闭' : '见详情' }}</span></div>
               <a class="detail-link" :href="`#/pois/${poi.id}${query}`">查看详情 <span aria-hidden="true">→</span></a>
+              <FavoriteAction v-if="favoritesOnly" :poi-id="poi.id" :poi-name="poi.name" :known-favorite="true" @changed="favoriteChanged" />
             </div>
           </article>
         </div>
@@ -117,9 +130,10 @@ onUnmounted(() => { sequence++; request?.abort(); clearTimeout(searchTimer); });
           <div><dt>核对时间</dt><dd>{{ detail.checkedAt ?? '未核对' }}</dd></div>
         </dl>
         <section class="booking"><h2>备注</h2><p>{{ detail.bookingNote ?? '暂无可靠的预约说明，不代表无需预约。' }}</p></section>
-        <div class="actions"><button disabled>♡ 收藏（尚未接入）</button><button disabled>＋ 加入行程（尚未接入）</button></div><p class="action-note">收藏和加入行程功能正在开发中。</p>
+        <FavoriteAction :poi-id="detail.id" :poi-name="detail.name" />
+        <div class="actions"><button disabled>＋ 加入行程（尚未接入）</button></div><p class="action-note">加入行程前端在独立分支准备，当前尚未接入。</p>
       </article>
-      <div v-else class="state"><h1>地点资料未找到</h1><p>地址可能无效，返回列表继续查看。</p><a class="button" :href="`#/discover${query}`">回到列表</a></div>
+      <div v-else class="state"><h1>地点资料未找到</h1><p>地址可能无效，返回列表继续查看。</p><a class="button" :href="`#${listPath}${query}`">回到列表</a></div>
     </section>
   </section>
   </div>

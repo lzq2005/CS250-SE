@@ -82,7 +82,7 @@ onMounted(() => {
           <div v-else-if="currentTrip.status === 'unavailable'" class="destination-card"><h1>旅行信息设置</h1><p>当前旅行暂时无法恢复，请重试，或开始新的旅行。</p><button @click="activeTrip.clear()">开始新的旅行</button></div>
           <TripSetup v-else :initial-trip="currentTrip.trip ?? undefined" @saved="activeTrip.saved" />
         </template>
-        <DiscoveryPage v-else-if="route.id === 'discover' || route.id === 'poi-detail'" :route="route" embedded @navigate="navigateTo" />
+        <DiscoveryPage v-else-if="route.id === 'discover' || route.id === 'poi-detail' || route.id === 'favorites'" :route="route" embedded @navigate="navigateTo" />
         <component :is="externalView" v-else-if="externalView" />
         <div v-else class="destination-card">
         <p class="eyebrow">{{ route.english }}</p>

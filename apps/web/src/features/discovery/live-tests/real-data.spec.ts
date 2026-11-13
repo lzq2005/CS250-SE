@@ -29,7 +29,8 @@ test('real records distinguish unknown fees, free admission and published weekly
   await expect(page.getByRole('heading', { name: '郑家大屋', exact: true })).toBeVisible();
   await expect(page.getByText('免费', { exact: true })).toBeVisible();
   await expect(page.getByText('周一 10:00–18:00；最晚入场 17:30', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: '♡ 收藏（尚未接入）' })).toBeDisabled();
+  await expect(page.getByLabel('地点收藏操作').getByRole('alert')).toContainText('暂不可用');
+  await expect(page.getByLabel('地点收藏操作').getByRole('button', { name: '收藏此地点', exact: false })).toBeDisabled();
   const response = await page.request.get('/api/v1/pois');
   expect(response.status()).toBe(200);
   const body = await response.json();
