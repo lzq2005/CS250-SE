@@ -10,6 +10,8 @@ import { createTripsRouter } from '../../apps/api/src/features/trips/router.js';
 import { readTrip } from '../../apps/api/src/features/trips/service.js';
 import { createTripService } from '../../apps/api/src/features/trips/service.js';
 import { isMacauPoint, originOptions } from '../../apps/api/src/features/trips/origins.js';
+import type { Currency, PlannerInput } from '@tripmate/contracts';
+import { referenceFx } from '../../apps/api/src/features/billing/reference-fx.js';
 const dir = mkdtempSync(join(tmpdir(), 'tripmate-a04-'));
 const db = new PrismaClient({ datasourceUrl: `file:${join(dir, 'trip.db').replaceAll('\\', '/')}` });
 const app = express(); app.use(express.json()); app.use('/api/v1', createTripsRouter(db));
@@ -23,6 +25,28 @@ const valid = () => ({ title: '澳门两日', startDate: '2028-02-28', endDate: 
   origin: { label: originOptions[0]!.label, position: originOptions[0]!.position, source: 'curated' },
   dayWindows: [{ date: '2028-02-28', start: '09:00', end: '18:00' }, { date: '2028-02-29', start: '10:00', end: '19:00' }], interests: ['history'], budget: null });
 describe('A-04 Trip API and real SQLite', () => {
+  it.each<Currency>(['MOP', 'HKD', 'CNY'])('A-06: preserves %s budget currency, zero, safe maximum and null through the existing API', async currency => {
+    const budget = { amountMinor: 0, currency };
+    const created = await request(app).post('/api/v1/trips').send({ ...valid(), budget });
+    expect(created.status).toBe(201);
+    const trip = created.body.data;
+    expect(trip.budget).toEqual(budget);
+    expect((await request(app).get(`/api/v1/trips/${trip.id}`)).body.data.budget).toEqual(budget);
+    const input: PlannerInput = {
+      trip: await db.$transaction(tx => readTrip(tx, trip.id)),
+      selectedPois: [], defaultTravelMode: 'walk', fxRates: referenceFx.readRates(),
+    };
+    expect(input.trip.budget).toEqual(budget);
+    expect(input.fxRates).toEqual([]); // Missing FX must never rewrite the original budget.
+    const maximum = { amountMinor: Number.MAX_SAFE_INTEGER, currency };
+    expect((await request(app).patch(`/api/v1/trips/${trip.id}`).send({ budget: maximum })).body.data.budget).toEqual(maximum);
+    expect((await request(app).get(`/api/v1/trips/${trip.id}`)).body.data.budget).toEqual(maximum);
+    expect((await request(app).patch(`/api/v1/trips/${trip.id}`).send({ title: 'Budget unchanged' })).body.data.budget).toEqual(maximum);
+    expect((await request(app).patch(`/api/v1/trips/${trip.id}`).send({ budget: null })).body.data.budget).toBeNull();
+    expect((await request(app).get(`/api/v1/trips/${trip.id}`)).body.data.budget).toBeNull();
+    const stored = await db.trip.findUniqueOrThrow({ where: { id: trip.id } });
+    expect(stored.budgetAmountMinor).toBeNull(); expect(stored.budgetCurrency).toBeNull();
+  });
   it('creates, lists, reopens and updates shared TripConfig without storage/private fields', async () => {
     const created = await request(app).post('/api/v1/trips').send({ ...valid(), budget: { amountMinor: Number.MAX_SAFE_INTEGER, currency: 'MOP' } });
     expect(created.status).toBe(201); const trip = created.body.data;
@@ -48,6 +72,10 @@ describe('A-04 Trip API and real SQLite', () => {
     { dayWindows: [{ date: '2028-02-28', start: '09:05', end: '18:00' }] },
     { budget: { amountMinor: -1, currency: 'MOP' } }, { budget: { amountMinor: 1.2, currency: 'MOP' } },
     { budget: { amountMinor: 9007199254740992, currency: 'MOP' } }, { budget: { amountMinor: 1, currency: 'USD' } },
+    { budget: { amountMinor: null, currency: 'MOP' } }, { budget: { amountMinor: '100', currency: 'MOP' } },
+    { budget: { amountMinor: 100, currency: null } }, { budget: { amountMinor: 100, currency: 'mop' } },
+    { budget: { amountMinor: 100 } }, { budget: { currency: 'HKD' } },
+    { budget: { amountMinor: 100, currency: 'CNY', fxRates: [] } },
     { interests: ['history', 'history'] }, { interests: ['unknown'] }, { companions: [] }, { id: crypto.randomUUID() },
     { origin: { ...valid().origin, position: { lat: 22.27, lng: 113.54 } } },
     { origin: { ...valid().origin, label: 'Forged curated' } },
