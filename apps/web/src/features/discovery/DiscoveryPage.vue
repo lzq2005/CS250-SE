@@ -2,6 +2,7 @@
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
 import type { Category, POI } from '@tripmate/contracts';
 import { listPois, getPoi } from './poi.api';
+import TargetActions from './TargetActions.vue';
 import type { ShellRoute } from '../../router/routes';
 const props = defineProps<{ route: ShellRoute; embedded?: boolean }>();
 const emit = defineEmits<{ navigate: [path: string, replace: boolean] }>();
@@ -117,7 +118,8 @@ onUnmounted(() => { sequence++; request?.abort(); clearTimeout(searchTimer); });
           <div><dt>核对时间</dt><dd>{{ detail.checkedAt ?? '未核对' }}</dd></div>
         </dl>
         <section class="booking"><h2>备注</h2><p>{{ detail.bookingNote ?? '暂无可靠的预约说明，不代表无需预约。' }}</p></section>
-        <div class="actions"><button disabled>♡ 收藏（尚未接入）</button><button disabled>＋ 加入行程（尚未接入）</button></div><p class="action-note">收藏和加入行程功能正在开发中。</p>
+        <div class="actions"><button disabled>♡ 收藏（尚未接入）</button></div>
+        <TargetActions :poi-id="detail.id" />
       </article>
       <div v-else class="state"><h1>地点资料未找到</h1><p>地址可能无效，返回列表继续查看。</p><a class="button" :href="`#/discover${query}`">回到列表</a></div>
     </section>
