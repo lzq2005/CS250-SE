@@ -73,6 +73,20 @@ it('guards apply by file hash and rejects contradictory/unknown flags', async ()
   expect(await db.pOI.count()).toBe(0);
 });
 
+it('refuses an existing unmigrated database without changing its schema or bytes', async () => {
+  const emptyPath = join(directory, 'unmigrated.db');
+  const empty = new PrismaClient({ datasourceUrl: `file:${emptyPath.replaceAll('\\', '/')}` });
+  try {
+    await empty.$queryRaw`SELECT 1`;
+    const before = readFileSync(emptyPath);
+    const run = cli(['--database', emptyPath, '--input', inputPath], false);
+    expect(run.status).not.toBe(0);
+    expect(await empty.$queryRaw`SELECT name FROM sqlite_master WHERE type = 'table'`).toEqual([]);
+    expect(readFileSync(emptyPath)).toEqual(before);
+    expect(await db.pOI.count()).toBe(0);
+  } finally { await empty.$disconnect(); }
+});
+
 it('applies ONLY synthetic data in this temporary DB and replays idempotently', async () => {
   const args = ['--apply', '--approved-sha256', sha256];
   const applied = cli(args);

@@ -76,6 +76,8 @@ in the production-entry E2E.
 
 ## Verification
 
+The original 2026-11-08 verification:
+
 - `npm run db:generate`: passed, Prisma 6.19.3.
 - `npm run lint`: passed.
 - `npm run typecheck`: passed, including CLI, config and integration tests.
@@ -104,3 +106,36 @@ contracts, web UI, server.ts and lockfile directly against main: all must match.
 Then publish the new independent branch without force push and create a Draft
 PR targeting main. No PR merge or auto-merge is authorized. Prior #10/#11
 merge-order blockers are resolved; A's Draft PR now needs peer review.
+
+## 2026-11-13 revalidation
+
+Fetched the original development repository again: `origin/main` remains
+`73314340ea24bc03435a6257607c034e3be46d2d`. The A branch already contains it;
+no merge/rebase or B feature replay is needed. Existing Draft PR #17 is open,
+unmerged and has no discussion/review comments at the time of inspection.
+Continue that PR instead of opening a duplicate. Original branches and commits,
+including `2f30979` and `3061a2a`, remain preserved.
+
+Reviewed all three production registrations and the existing default dry-run
+CLI. No production implementation change was necessary. Added one CLI regression
+case for an existing but unmigrated temporary SQLite: failure must leave both
+schema and file bytes unchanged. This complements missing-path, approval-hash,
+identity-conflict, default zero-write and isolated idempotent-apply checks.
+
+Actual reruns on 2026-11-13:
+
+- `npm run db:generate`, `npm run lint`, `npm run typecheck`, `npm run build`: passed.
+- `npm test -- --maxWorkers=2`: 11 files, 172 tests passed. The infrastructure
+  suite was initialized in a newly created OS temporary directory; business
+  suites created their own temporary SQLite databases.
+- `npm run test:e2e:poi-integration`: 31 tests passed using the compiled
+  production server entry and a new temporary SQLite database.
+- B feature code, fixtures, Prisma schema/migrations, public contracts, web UI,
+  C/D code, `server.ts` and lockfile remain identical to fetched main.
+
+No formal/demo SQLite was accessed, migrated or seeded. No reads or writes were
+made to the course repository, its `main`,
+`migration/tripmate-stable-20261112` or migration PR #1. This task publishes only
+to `lzq2005/CS250-SE`, branch `feat/a/api-router-integration`, Draft PR #17.
+Formal-target verification/import remains a separate future task requiring a
+confirmed target and explicit approval for any formal migration or Seed apply.
