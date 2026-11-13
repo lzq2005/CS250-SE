@@ -11,6 +11,8 @@
   "include": [
     "unit/**/*.ts",
     "e2e/**/*.ts",
+    "integration/**/*.ts",
+    "../playwright.poi-integration.config.ts",
     "../playwright.config.ts",
     "../vitest.config.ts",
     "../apps/api/src/**/*.ts"

@@ -19,6 +19,8 @@
     "test:e2e": "playwright test",
     "db:generate": "prisma generate --schema apps/api/prisma/schema.prisma",
     "db:setup": "node scripts/database.mjs",
+    "db:seed:pois": "node --import tsx apps/api/src/cli/seed-pois.ts",
+    "test:e2e:poi-integration": "playwright test --config playwright.poi-integration.config.ts",
     "start": "npm run start -w @tripmate/api",
     "check": "npm run lint && npm run typecheck && npm test && npm run build",
     "postinstall": "npm run build -w @tripmate/contracts"
